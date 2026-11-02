@@ -624,55 +624,68 @@
 
     }
 
-
+   
     // Character click events
-
+    
     cards.forEach(card => {
-
       card.addEventListener("click", () => {
         selectCharacter(card);
       });
-
     });
- 
-   
+    
+    
+    /* ==========================================
+       PLAY AGAIN — RESET GAME
+    ========================================== */
+    
+    replay.addEventListener("click", async () => {
+    
+      if (!playing || !ending.classList.contains("visible")) {
+        return;
+      }
+    
+      replay.disabled = true;
+    
+      // Hide ending
+    
+      ending.classList.remove("visible");
+      message.style.opacity = "0";
+    
+      await wait(1000);
+    
       // Reset revelation
-
+    
       message.textContent = "";
       message.classList.remove("revelation");
       message.style.opacity = "1";
-
-
+    
       // Reset characters
-
+    
       cards.forEach(card => {
         card.classList.remove("selected");
       });
-
+    
       heroes.classList.remove("has-selection");
       heroes.style.display = "grid";
-
-
+    
       // Fade characters back in
-
+    
       requestAnimationFrame(() =>
         requestAnimationFrame(() =>
           heroes.classList.remove("vanish")
         )
       );
-
-
+    
       // Reset subtitle
-
+    
       subtitle.textContent = "CHOOSE YOUR CHARACTER";
       subtitle.style.opacity = "1";
-
-
+    
       // Unlock game
-
+    
       replay.disabled = false;
       playing = false;
-
+    
     });
 
   </script>
