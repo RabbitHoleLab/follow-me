@@ -719,35 +719,68 @@
 
       await reveal(finalMessage, 5000);
 
-      // A journey counts only when completed
+      
+      /* ==========================================
+         ATTEMPT COUNTER
+      ========================================== */
+      
+      // Count a completed journey
       attemptCount++;
-
-      // ==========================================
-      // SYSTEM ANOMALY
-      // Appears from the third completed journey
-      // ==========================================
-
-      if (attemptCount >= 3) {
-
-        // Return the Matrix to its original green
+      
+      // Save progress for future visits
+      localStorage.setItem(
+        progressKey,
+        String(attemptCount)
+      );
+      
+      /* ==========================================
+         REMAINING ATTEMPTS
+      ========================================== */
+      
+      if (attemptCount === 1) {
+      
+        await reveal(
+          "2 ATTEMPTS REMAINING",
+          3500
+        );
+      
+      } else if (attemptCount === 2) {
+      
+        await reveal(
+          "1 ATTEMPT REMAINING",
+          3500
+        );
+      
+      }
+      
+      /* ==========================================
+         SYSTEM ANOMALY — ONLY ONCE
+      ========================================== */
+      
+      else if (attemptCount === 3) {
+      
         matrixColor = "#57d98b";
-
+      
         await reveal(
           "SYSTEM ANOMALY",
           2500
         );
-
+      
         await reveal(
           "EXPAND YOUR MIND",
           3500
         );
-
+      
         await reveal(
           "THINK OUTSIDE THE BOX",
           5000
         );
-
+      
       }
+      
+      // From the fourth journey onward:
+      // no countdown and no anomaly
+
 
       // ==========================================
       // SHOW REPLAY OPTION
