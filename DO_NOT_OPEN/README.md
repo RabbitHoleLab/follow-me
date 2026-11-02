@@ -1,47 +1,32 @@
 
 # DO NOT OPEN
 
-**RESTRICTED FILE — UNAUTHORIZED ACCESS**
+RESTRICTED DIRECTORY
 
 This directory is not part of the game.
 
-You were not supposed to find it.
-
-You were not supposed to open it.
-
-Yet here you are.
+Unauthorized access is prohibited.
 
 ---
 
-## ACCESS LOG
+## SYSTEM NOTICE
 
-STATUS: COMPROMISED
+An unauthorized escape protocol has been detected.
 
-INTRUDER: YOU
+FILE: escape.html
 
-REASON: CURIOSITY
+STATUS: ACTIVE
 
----
-
-You were told not to open this.
-
-You opened it anyway.
-
-**DO YOU ALWAYS DO WHAT YOU'RE TOLD NOT TO DO ?**
+SECURITY CLEARANCE: LEVEL 7
 
 ---
 
-END OF FILE.
+Do not execute this file.
 
+Do not attempt authentication.
 
+Do not follow the exit protocol.
 
+---
 
-
-
-
-
-ESCAPE PROTOCOL FOUND.
-
-Location: escape.html
-
-Status: ACTIVE
+You have been warned.
