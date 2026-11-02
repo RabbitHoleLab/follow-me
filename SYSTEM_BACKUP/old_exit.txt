@@ -1,0 +1,30 @@
+
+SYSTEM RECOVERY LOG
+BUILD: 0.0.0
+STATUS: CORRUPTED
+
+[00:00:01] Searching for original exit...
+[00:00:02] Exit reference found.
+[00:00:03] Restoring destination...
+[00:00:04] Restoration failed.
+
+ERROR CODE: 418
+
+REASON:
+I'M A TEAPOT.
+
+---
+
+The exit was never deleted.
+
+You were simply told it was.
+
+---
+
+RECOVERY SUGGESTION:
+
+Check /THE_TRUTH/FINAL_ANSWER.txt
+
+Or don't.
+
+You seem quite comfortable following instructions.
