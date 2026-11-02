@@ -323,17 +323,33 @@
     /* ==========================================
        6. THE SYSTEM LOSES PATIENCE
        ========================================== */
-
+    
     function annoySystem() {
       attempts++;
-
+    
+      // Seventh click: the system finally "gives up".
+      if (attempts >= 7) {
+        stage = "return";
+    
+        title.textContent = "EXIT SUCCESSFUL";
+    
+        description.textContent =
+          "FINE. I'LL TAKE YOU TO THE EXIT MYSELF.\n\n" +
+          "CONGRATULATIONS.\n" +
+          "YOU HAVE SUCCESSFULLY GONE NOWHERE.";
+    
+        mainButton.textContent = "RETURN TO EXIT";
+        return;
+      }
+    
+      // The usual increasingly ridiculous messages.
       const index = Math.min(
         attempts,
         messages.length - 1
       );
-
+    
       description.textContent = messages[index];
-
+    
       if (attempts < 3) {
         mainButton.textContent = "TRY AGAIN";
       } else if (attempts < 5) {
@@ -341,7 +357,7 @@
       } else {
         mainButton.textContent = "STILL HERE?";
       }
-
+    
       if (attempts >= 5) {
         title.textContent = "SYSTEM EXHAUSTED";
       }
@@ -389,6 +405,20 @@
         annoySystem();
       }
     });
+   
+    mainButton.addEventListener("click", () => {
+      if (stage === "ready") {
+        startExit();
+      } else if (stage === "authorization") {
+        revealTrap();
+      } else if (stage === "trapped") {
+        annoySystem();
+      } else if (stage === "return") {
+        window.location.href =
+          "https://rabbitholelab.github.io/follow-me/";
+      }
+    });
+
 
     restartButton.addEventListener("click", restart);
 
