@@ -309,7 +309,7 @@
 
     @media (max-width: 700px) {
 
-      /* ==========================================
+    /* ==========================================
          MOBILE — MAIN LAYOUT
       ========================================== */
       
@@ -362,6 +362,21 @@
       .hero-name {
         font-size: 13px;
         padding: 11px 3px;
+      }
+      
+      /* ==========================================
+         MOBILE — SMALLER CHARACTER CARDS
+      ========================================== */
+      
+      .heroes {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+      
+        width: 85%;
+        max-width: 390px;
+      
+        margin-left: auto;
+        margin-right: auto;
       }
 
     }
