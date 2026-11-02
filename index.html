@@ -277,6 +277,7 @@
       opacity: 1;
     }
     
+    
     /* ==========================================
        THE CAPSULE — PHOTOREALISTIC IMAGE
        Decorative, never clickable
@@ -284,7 +285,6 @@
     
     #choice-capsule {
       display: none;
-    
       width: 180px;
       max-width: 65vw;
       height: auto;
@@ -292,21 +292,45 @@
       object-fit: contain;
       pointer-events: none;
     
-      filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.15));
+      filter: drop-shadow(
+        0 0 15px rgba(255, 255, 255, 0.15)
+      );
     }
     
-    /* Show the capsule during the endless loop */
+    /* Capsule above the message */
     main.endless-loop #choice-capsule {
       display: block;
+      position: absolute;
+    
+      left: 50%;
+      top: calc(50% - 170px);
+    
+      transform: translateX(-50%);
+      z-index: 2;
+    }
+    
+    /* Keep the question centered */
+    main.endless-loop #message {
+      position: relative;
+      z-index: 1;
+    }
+    
+    /* Ending below the question */
+    main.endless-loop #ending {
+      top: calc(50% + 85px);
     }
     
     /* Mobile */
     @media (max-width: 700px) {
-      #choice-capsule {
+      main.endless-loop #choice-capsule {
         width: 135px;
+        top: calc(50% - 145px);
+      }
+    
+      main.endless-loop #ending {
+        top: calc(50% + 105px);
       }
     }
-
 
     /* ==========================================
        PLAY AGAIN BUTTON
