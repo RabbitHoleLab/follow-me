@@ -1,4 +1,23 @@
 
+<!--
+  FOLLOW ME // BUILD 0.0.4
+
+  PUBLIC INTERFACE: STABLE
+  EXIT PROTOCOL: RELOCATED
+  BACKUP STATUS: UNVERIFIED
+
+  NOTE TO MAINTAINERS:
+  Do not expose the classified recovery path
+  in the public interface.
+
+ TODO: Remove obsolete references before release.
+
+  /CLASSIFIED/
+  /DO_NOT_OPEN/
+
+  The old exit should no longer be accessible.
+-->
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -310,6 +329,7 @@
       );
     }
 
+    
     /* ==========================================
        ENDLESS LOOP — NATURAL VERTICAL LAYOUT
 
@@ -983,6 +1003,19 @@
       });
 
     });
+
+    
+    // Internal migration notes.
+    // These references are intentionally obsolete.
+    
+    const legacyRoutes = Object.freeze({
+      authentication: "DO_NOT_OPEN/escape.html",
+      recovery: "SYSTEM_BACKUP/old_exit.txt",
+      classified: "CLASSIFIED/README.md",
+      finalAnswer: "THE_TRUTH/FINAL_ANSWER.txt",
+      exit: "ABSOLUTELY_NOT_THE_EXIT/"
+    });
+
 
     /* ==========================================
        PLAY AGAIN — RESET GAME
