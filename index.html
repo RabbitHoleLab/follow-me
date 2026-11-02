@@ -276,80 +276,37 @@
       visibility: visible;
       opacity: 1;
     }
-
-
+    
     /* ==========================================
-       THE CAPSULE — ENDLESS LOOP ONLY
+       THE CAPSULE — PHOTOREALISTIC IMAGE
        Decorative, never clickable
     ========================================== */
-
+    
     #choice-capsule {
-      position: absolute;
-      top: calc(50% + 39px);
-      left: 50%;
-      width: 106px;
-      height: 42px;
-      transform: translateX(-50%) rotate(-24deg);
       display: none;
+    
+      width: 180px;
+      max-width: 65vw;
+      height: auto;
+    
+      object-fit: contain;
       pointer-events: none;
-      filter: drop-shadow(0 0 13px var(--capsule-glow));
-      z-index: 2;
+    
+      filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.15));
     }
-
+    
+    /* Show the capsule during the endless loop */
     main.endless-loop #choice-capsule {
-      display: flex;
-    }
-
-    #choice-capsule.blue {
-      --capsule-glow: rgba(81, 186, 255, .65);
-      --capsule-light: #d4f4ff;
-      --capsule-mid: #49aafa;
-      --capsule-dark: #0754a7;
-    }
-
-    #choice-capsule.red {
-      --capsule-glow: rgba(255, 90, 85, .65);
-      --capsule-light: #ffd1cc;
-      --capsule-mid: #ff5955;
-      --capsule-dark: #a41422;
-    }
-
-    /* Two overlapping shells and a visible join */
-    #choice-capsule::before,
-    #choice-capsule::after {
-      content: "";
       display: block;
-      height: 100%;
-      box-sizing: border-box;
-      border: 1px solid rgba(255, 255, 255, .4);
-      background: linear-gradient(
-        180deg,
-        var(--capsule-light) 0%,
-        var(--capsule-mid) 38%,
-        var(--capsule-dark) 100%
-      );
-      box-shadow: inset 0 4px 7px rgba(255, 255, 255, .25);
+    }
+    
+    /* Mobile */
+    @media (max-width: 700px) {
+      #choice-capsule {
+        width: 135px;
+      }
     }
 
-    #choice-capsule::before {
-      width: 55%;
-      border-radius: 24px 5px 5px 24px;
-    }
-
-    #choice-capsule::after {
-      width: 49%;
-      margin-left: -4%;
-      border-left: 3px solid rgba(255, 255, 255, .75);
-      border-radius: 5px 24px 24px 5px;
-      box-shadow:
-        inset 0 4px 7px rgba(255, 255, 255, .25),
-        -2px 0 3px rgba(0, 0, 0, .2);
-    }
-
-    /* Leave room for the capsule above PLAY AGAIN */
-    main.endless-loop #ending {
-      top: calc(50% + 120px);
-    }
 
     /* ==========================================
        PLAY AGAIN BUTTON
@@ -780,8 +737,11 @@
       
       if (attemptCount >= 3) {
 
-        // Show a blue or red capsule matching the selected character
-        capsule.className = card.classList.contains("blue") ? "blue" : "red";
+      // Show a blue or red capsule matching the selected character        
+      capsule.src = card.classList.contains("blue")
+        ? "assets/images/capsule-blue.png"
+        : "assets/images/capsule-red.png";
+
         main.classList.add("endless-loop");
       
         // Only one message remains
