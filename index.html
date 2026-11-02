@@ -40,8 +40,6 @@
       position: relative;
       z-index: 1;
       min-height: 100vh;
-      padding-top: 180px;
-      padding-bottom: 60px;
       padding: 180px 20px 60px;
       display: flex;
       flex-direction: column;
@@ -50,32 +48,27 @@
       gap: 28px;
       text-align: center;
     }
-    
-   
+
     /* ==========================================
-       TITLE — FIXED POSITION
+       TITLE
     ========================================== */
-    
+
     h1 {
       position: absolute;
       top: 9vh;
       left: 20px;
       right: 20px;
-    
       margin: 0;
-    
       font-size: clamp(23px, 3.6vw, 43px);
       letter-spacing: 3px;
       text-shadow: 0 0 22px #18a755;
-    
       transition: opacity 1.2s ease;
     }
-    
+
     h1.fade-out {
       opacity: 0;
       pointer-events: none;
     }
-
 
     /* ==========================================
        CHARACTER GRID
@@ -86,7 +79,6 @@
       grid-template-columns: repeat(4, minmax(0, 1fr));
       gap: 18px;
       width: min(1100px, 100%);
-
       transition:
         opacity 1s ease,
         transform 1s ease;
@@ -97,23 +89,18 @@
       min-width: 0;
       overflow: hidden;
       padding: 0;
-
       border: 2px solid var(--accent);
       border-radius: 13px;
-
       background: #06100c;
       color: white;
       cursor: pointer;
-
       box-shadow: 0 0 15px var(--glow);
-
       transition:
         transform .5s ease,
         box-shadow .5s ease,
         opacity .7s ease,
         filter .7s ease;
     }
-
 
     /* Character colors */
 
@@ -126,7 +113,6 @@
       --accent: #ff5a55;
       --glow: rgba(255, 50, 40, .3);
     }
-
 
     /* Hover effects */
 
@@ -142,7 +128,6 @@
       outline-offset: 3px;
     }
 
-
     /* Character portraits */
 
     .hero img {
@@ -153,20 +138,16 @@
       object-position: center top;
     }
 
-
     /* Character names */
 
     .hero-name {
       display: block;
       padding: 14px 5px;
-
       background: rgba(0, 0, 0, .88);
-
       font-family: Georgia, serif;
       font-size: clamp(12px, 1.5vw, 20px);
       letter-spacing: 1px;
     }
-
 
     /* ==========================================
        SUBTITLE AND MESSAGES
@@ -195,7 +176,6 @@
       text-shadow: 0 0 25px #57d98b;
     }
 
-
     /* ==========================================
        CHARACTER SELECTION ANIMATION
     ========================================== */
@@ -209,11 +189,9 @@
     .heroes.has-selection .hero.selected,
     .heroes.has-selection .hero.selected:hover {
       transform: scale(1.06);
-
       box-shadow:
         0 0 25px var(--accent),
         0 0 65px var(--glow);
-
       z-index: 2;
     }
 
@@ -223,33 +201,26 @@
       pointer-events: none;
     }
 
-
-    
     /* ==========================================
        END SCREEN
        Space reserved to prevent layout shifts
     ========================================== */
-    
+
     #ending {
       display: flex;
       visibility: hidden;
       opacity: 0;
-    
       flex-direction: column;
       align-items: center;
       gap: 22px;
-    
       min-height: 105px;
-    
       transition: opacity 1s ease;
     }
-    
+
     #ending.visible {
       visibility: visible;
       opacity: 1;
     }
-
-
 
     /* ==========================================
        PLAY AGAIN BUTTON
@@ -257,17 +228,13 @@
 
     #play-again {
       padding: 13px 32px;
-
       border: 1px solid #57d98b;
       border-radius: 30px;
-
       background: rgba(0, 20, 10, .8);
       color: #caffd8;
-
       font-size: 14px;
       letter-spacing: 3px;
       cursor: pointer;
-
       transition:
         background .3s,
         box-shadow .3s,
@@ -281,7 +248,6 @@
       transform: scale(1.06);
     }
 
-
     /* ==========================================
        RESPONSIVE — MOBILE
     ========================================== */
@@ -293,7 +259,6 @@
         gap: 20px;
       }
 
-    
       .heroes {
         grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 12px;
@@ -306,7 +271,6 @@
       }
 
     }
-
 
     /* ==========================================
        ACCESSIBILITY
@@ -328,7 +292,6 @@
   </style>
 </head>
 
-
 <body>
 
   <!-- ========================================
@@ -337,7 +300,6 @@
 
   <canvas id="matrix" aria-hidden="true"></canvas>
 
-
   <!-- ========================================
        MAIN CONTENT
   ========================================= -->
@@ -345,7 +307,6 @@
   <main>
 
     <h1>WHAT KIND OF PLAYER ARE YOU ?</h1>
-
 
     <!-- CHARACTER SELECTION -->
 
@@ -363,7 +324,6 @@
         <span class="hero-name">THE GUARDIAN</span>
       </button>
 
-
       <button
         type="button"
         class="hero blue"
@@ -376,7 +336,6 @@
         <span class="hero-name">THE DREAMER</span>
       </button>
 
-
       <button
         type="button"
         class="hero red"
@@ -388,7 +347,6 @@
         >
         <span class="hero-name">THE REBEL</span>
       </button>
-
 
       <button
         type="button"
@@ -404,11 +362,9 @@
 
     </section>
 
-
     <!-- SUBTITLE -->
 
     <p class="subtitle">CHOOSE YOUR CHARACTER</p>
-
 
     <!-- REVELATION MESSAGES -->
 
@@ -417,7 +373,6 @@
       role="status"
       aria-live="polite"
     ></div>
-
 
     <!-- END SCREEN -->
 
@@ -433,7 +388,6 @@
 
   </main>
 
-
   <script>
 
     /* ==========================================
@@ -444,11 +398,11 @@
     const ctx = canvas.getContext("2d");
 
     const fontSize = 16;
-    
+
     // ==========================================
     // MATRIX COLOR EFFECT
     // ==========================================
-    
+
     let matrixColor = "#57d98b";
 
     const chars =
@@ -456,7 +410,6 @@
 
     let drops = [];
     let width, height;
-
 
     // Resize canvas
 
@@ -482,7 +435,6 @@
 
     }
 
-
     // Draw Matrix rain
 
     function draw() {
@@ -492,7 +444,7 @@
 
       ctx.font = fontSize + "px monospace";
       ctx.fillStyle = matrixColor;
-      
+
       drops.forEach((drop, i) => {
 
         const char =
@@ -513,7 +465,6 @@
 
     }
 
-
     // Initialize Matrix
 
     addEventListener("resize", resize);
@@ -525,7 +476,6 @@
     } else {
       draw();
     }
-
 
     /* ==========================================
        CHARACTER SELECTION
@@ -546,6 +496,8 @@
 
     let playing = false;
 
+    // Count completed character journeys
+    let attemptCount = 0;
 
     // Wait helper
 
@@ -554,12 +506,11 @@
         setTimeout(resolve, reducedMotion ? 0 : ms)
       );
 
-
     /* ==========================================
        REVELATION TEXT
     ========================================== */
 
-    async function (text, duration = 2600) {
+    async function reveal(text, duration = 2600) {
 
       message.style.opacity = "0";
 
@@ -572,7 +523,6 @@
 
     }
 
-
     /* ==========================================
        SELECT CHARACTER
     ========================================== */
@@ -583,17 +533,15 @@
 
       playing = true;
 
-      
       // ==========================================
-      // MATRIX COLOR FLASH
+      // MATRIX COLOR EFFECT
       // Blue characters / Red characters
       // ==========================================
-      
+
       matrixColor = card.classList.contains("blue")
         ? "#51baff"
         : "#ff5a55";
-      
-     
+
       // Highlight selected character
 
       heroes.classList.add("has-selection");
@@ -602,7 +550,6 @@
       subtitle.textContent = "CHARACTER SELECTED";
 
       await wait(1900);
-
 
       // Make characters disappear
 
@@ -614,13 +561,14 @@
 
       // Keep the character grid in the layout
       // to avoid a sudden vertical repositioning
-      
+
       heroes.style.visibility = "hidden";
-      
+
       message.classList.add("revelation");
 
-
-      // Philosophical revelation
+      // ==========================================
+      // PHILOSOPHICAL REVELATION
+      // ==========================================
 
       await reveal("YOU CHOSE A CHARACTER");
 
@@ -639,20 +587,51 @@
         3200
       );
 
-      
-      // Final message depends on the chosen path
-      
+      // ==========================================
+      // FINAL MESSAGE — BLUE OR RED
+      // ==========================================
+
       const finalMessage = card.classList.contains("blue")
         ? "DON'T FORGET TO LOVE YOURSELF ❤️"
-        : "DO YOU REALLY LOVE YOURSELF ?";
-      
+        : "DID YOU REALLY CHOOSE YOURSELF ?";
+
       await reveal(finalMessage, 5000);
 
+      // A journey counts only when completed
+      attemptCount++;
 
+      // ==========================================
+      // SYSTEM ANOMALY
+      // Appears from the third completed journey
+      // ==========================================
 
-      // Show replay option
+      if (attemptCount >= 3) {
 
-       requestAnimationFrame(() =>
+        // Return the Matrix to its original green
+        matrixColor = "#57d98b";
+
+        await reveal(
+          "SYSTEM ANOMALY",
+          2500
+        );
+
+        await reveal(
+          "EXPAND YOUR MIND",
+          3500
+        );
+
+        await reveal(
+          "THINK OUTSIDE THE BOX",
+          5000
+        );
+
+      }
+
+      // ==========================================
+      // SHOW REPLAY OPTION
+      // ==========================================
+
+      requestAnimationFrame(() =>
         requestAnimationFrame(() =>
           ending.classList.add("visible")
         )
@@ -660,72 +639,72 @@
 
     }
 
-   
     // Character click events
-    
+
     cards.forEach(card => {
+
       card.addEventListener("click", () => {
         selectCharacter(card);
       });
+
     });
-    
-    
+
     /* ==========================================
        PLAY AGAIN — RESET GAME
     ========================================== */
-    
+
     replay.addEventListener("click", async () => {
-    
+
       if (!playing || !ending.classList.contains("visible")) {
         return;
       }
-    
+
       replay.disabled = true;
 
       // Restore the original Matrix color
       matrixColor = "#57d98b";
-    
+
       // Hide ending
-    
+
       ending.classList.remove("visible");
       message.style.opacity = "0";
-    
+
       await wait(1000);
-    
+
       // Reset revelation
-    
+
       message.textContent = "";
       message.classList.remove("revelation");
       message.style.opacity = "1";
-    
+
       // Reset characters
-    
+
       cards.forEach(card => {
         card.classList.remove("selected");
       });
-    
+
       heroes.classList.remove("has-selection");
       heroes.style.visibility = "visible";
-    
+
       // Fade characters back in
-    
+
       requestAnimationFrame(() =>
         requestAnimationFrame(() =>
           heroes.classList.remove("vanish")
         )
       );
-    
+
       // Reset subtitle
-    
+
       subtitle.textContent = "CHOOSE YOUR CHARACTER";
       subtitle.style.opacity = "1";
       title.classList.remove("fade-out");
-    
+
       // Unlock game
-    
+
       replay.disabled = false;
       playing = false;
-    
+
     });
 
   </script>
