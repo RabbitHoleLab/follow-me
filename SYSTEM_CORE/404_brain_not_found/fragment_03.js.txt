@@ -1,0 +1,3 @@
+// FRAGMENT 03 / 07 — USER VERIFICATION
+  const identity = "CURIOUS HUMAN";
+  log(`[IDENTITY] ${identity} detected.`);
