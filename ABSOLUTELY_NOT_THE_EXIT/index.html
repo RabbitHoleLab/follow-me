@@ -1,0 +1,507 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>EXIT PROTOCOL // FOLLOW ME</title>
+
+  <style>
+    /* ==========================================
+       FOLLOW ME — FAKE EXIT PROTOCOL
+       Standalone Easter egg
+       ========================================== */
+
+    :root {
+      --green: #83e69b;
+      --green-dim: #446b4c;
+      --background: #030806;
+      --foreground: #e0fbe5;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 24px;
+      background: var(--background);
+      color: var(--foreground);
+      font-family: Consolas, "Courier New", monospace;
+      overflow-x: hidden;
+    }
+
+    /* Matrix rain, behind the interface */
+    #matrix {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      opacity: 0.28;
+      pointer-events: none;
+    }
+
+    .terminal {
+      position: relative;
+      z-index: 1;
+      width: min(100%, 560px);
+      padding: clamp(24px, 5vw, 48px);
+      background: rgba(3, 12, 7, 0.93);
+      border: 1px solid var(--green-dim);
+      box-shadow:
+        0 0 45px rgba(65, 190, 100, 0.09),
+        inset 0 0 30px rgba(65, 190, 100, 0.03);
+      text-align: center;
+    }
+
+    .eyebrow {
+      margin-bottom: 24px;
+      color: var(--green);
+      font-size: 11px;
+      letter-spacing: 3px;
+    }
+
+    h1 {
+      margin: 0 0 18px;
+      font-size: clamp(23px, 5vw, 34px);
+      font-weight: 400;
+      letter-spacing: 2px;
+    }
+
+    .description {
+      min-height: 54px;
+      margin: 0 0 24px;
+      color: #a5bca9;
+      font-size: 13px;
+      line-height: 1.8;
+      white-space: pre-line;
+    }
+
+    .progress-track {
+      display: none;
+      width: 100%;
+      height: 9px;
+      margin: 26px 0 12px;
+      overflow: hidden;
+      background: #18311f;
+      border: 1px solid #355a3d;
+    }
+
+    .progress-bar {
+      width: 0%;
+      height: 100%;
+      background: var(--green);
+      box-shadow: 0 0 14px var(--green);
+      transition: width 0.12s linear;
+    }
+
+    .progress-label {
+      display: none;
+      margin-bottom: 25px;
+      color: var(--green);
+      font-size: 12px;
+    }
+
+    button {
+      display: block;
+      width: 100%;
+      min-height: 48px;
+      margin-top: 12px;
+      padding: 13px 18px;
+      background: transparent;
+      border: 1px solid var(--green);
+      color: var(--green);
+      font: inherit;
+      font-size: 12px;
+      letter-spacing: 1px;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+    }
+
+    button:hover,
+    button:focus-visible {
+      background: var(--green);
+      color: #031006;
+      outline-offset: 3px;
+    }
+
+    .secondary {
+      border-color: #496350;
+      color: #9aad9e;
+    }
+
+    .secondary:hover,
+    .secondary:focus-visible {
+      background: #9aad9e;
+      color: #031006;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .footer {
+      margin-top: 32px;
+      color: #587360;
+      font-size: 10px;
+      letter-spacing: 1px;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .progress-bar {
+        transition: none;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <canvas id="matrix" aria-hidden="true"></canvas>
+
+  <main class="terminal">
+    <div class="eyebrow">
+      FOLLOW ME // INTERNAL SYSTEM
+    </div>
+
+    <h1 id="title">EXIT AVAILABLE</h1>
+
+    <p id="description" class="description" aria-live="polite">
+      External reality connection established.
+      Final authorization required.
+    </p>
+
+    <div id="progressTrack" class="progress-track">
+      <div id="progressBar" class="progress-bar"></div>
+    </div>
+
+    <div id="progressLabel" class="progress-label">
+      0% COMPLETE
+    </div>
+
+    <button id="mainButton" type="button">
+      INITIATE EXIT PROTOCOL
+    </button>
+
+    <button id="restartButton"
+            class="secondary hidden"
+            type="button">
+      RESTART THE ILLUSION
+    </button>
+
+    <div class="footer">
+      NO USER WAS RELEASED DURING THIS PROCEDURE
+    </div>
+  </main>
+
+  <script>
+    "use strict";
+
+    /* ==========================================
+       1. ELEMENTS
+       ========================================== */
+
+    const title = document.getElementById("title");
+    const description = document.getElementById("description");
+    const progressTrack = document.getElementById("progressTrack");
+    const progressBar = document.getElementById("progressBar");
+    const progressLabel = document.getElementById("progressLabel");
+    const mainButton = document.getElementById("mainButton");
+    const restartButton = document.getElementById("restartButton");
+
+    let stage = "ready";
+    let attempts = 0;
+    let progressTimer = null;
+
+    /* ==========================================
+       2. SYSTEM MESSAGES
+       ========================================== */
+
+    const messages = [
+      "EXIT SUCCESSFULLY LOCATED.\n" +
+      "UNFORTUNATELY, YOU ARE STILL HERE.",
+
+      "PLEASE STOP CLICKING.",
+
+      "THIS IS BECOMING EMBARRASSING.",
+
+      "HAVE YOU CONSIDERED CLOSING THE TAB?",
+
+      "THE SYSTEM HAS RUN OUT OF EXCUSES.",
+
+      "YOU DO NOT NEED OUR PERMISSION TO LEAVE.",
+
+      "AND YET, HERE YOU ARE."
+    ];
+
+    /* ==========================================
+       3. START THE FAKE EXIT
+       ========================================== */
+
+    function startExit() {
+      if (stage !== "ready") return;
+
+      stage = "loading";
+
+      title.textContent = "EXIT PROTOCOL";
+      description.textContent =
+        "Establishing connection to external reality...";
+
+      progressTrack.style.display = "block";
+      progressLabel.style.display = "block";
+      progressBar.style.width = "0%";
+      progressLabel.textContent = "0% COMPLETE";
+
+      mainButton.disabled = true;
+      mainButton.textContent = "PROCESSING...";
+
+      let progress = 0;
+
+      progressTimer = window.setInterval(() => {
+        // The progress slows down near the end.
+        const increment =
+          progress < 70 ? 3 :
+          progress < 90 ? 1 :
+          0.5;
+
+        progress = Math.min(99, progress + increment);
+
+        progressBar.style.width = progress + "%";
+        progressLabel.textContent =
+          Math.floor(progress) + "% COMPLETE";
+
+        if (progress >= 99) {
+          window.clearInterval(progressTimer);
+          progressTimer = null;
+          requestAuthorization();
+        }
+      }, 90);
+    }
+
+    /* ==========================================
+       4. FAKE FINAL AUTHORIZATION
+       ========================================== */
+
+    function requestAuthorization() {
+      stage = "authorization";
+
+      title.textContent = "99% COMPLETE";
+      description.textContent =
+        "External reality located.\n" +
+        "Awaiting final user authorization.";
+
+      mainButton.disabled = false;
+      mainButton.textContent = "AUTHORIZE EXIT";
+    }
+
+    /* ==========================================
+       5. THE EXIT DOES NOT EXIST
+       ========================================== */
+
+    function revealTrap() {
+      stage = "trapped";
+      attempts = 0;
+
+      title.textContent = "EXIT DENIED";
+      description.textContent = messages[0];
+
+      progressLabel.textContent =
+        "99% COMPLETE — INDEFINITELY";
+
+      mainButton.textContent = "PLEASE STOP CLICKING";
+      restartButton.classList.remove("hidden");
+    }
+
+    /* ==========================================
+       6. THE SYSTEM LOSES PATIENCE
+       ========================================== */
+
+    function annoySystem() {
+      attempts++;
+
+      const index = Math.min(
+        attempts,
+        messages.length - 1
+      );
+
+      description.textContent = messages[index];
+
+      if (attempts < 3) {
+        mainButton.textContent = "TRY AGAIN";
+      } else if (attempts < 5) {
+        mainButton.textContent = "ONE MORE TIME?";
+      } else {
+        mainButton.textContent = "STILL HERE?";
+      }
+
+      if (attempts >= 5) {
+        title.textContent = "SYSTEM EXHAUSTED";
+      }
+    }
+
+    /* ==========================================
+       7. RESTART
+       ========================================== */
+
+    function restart() {
+      if (progressTimer !== null) {
+        window.clearInterval(progressTimer);
+        progressTimer = null;
+      }
+
+      stage = "ready";
+      attempts = 0;
+
+      title.textContent = "EXIT AVAILABLE";
+      description.textContent =
+        "External reality connection established.\n" +
+        "Final authorization required.";
+
+      progressTrack.style.display = "none";
+      progressLabel.style.display = "none";
+      progressBar.style.width = "0%";
+
+      mainButton.disabled = false;
+      mainButton.textContent =
+        "INITIATE EXIT PROTOCOL";
+
+      restartButton.classList.add("hidden");
+    }
+
+    /* ==========================================
+       8. BUTTON EVENTS
+       ========================================== */
+
+    mainButton.addEventListener("click", () => {
+      if (stage === "ready") {
+        startExit();
+      } else if (stage === "authorization") {
+        revealTrap();
+      } else if (stage === "trapped") {
+        annoySystem();
+      }
+    });
+
+    restartButton.addEventListener("click", restart);
+
+    /* ==========================================
+       9. MATRIX RAIN
+       ========================================== */
+
+    const canvas = document.getElementById("matrix");
+    const context = canvas.getContext("2d");
+
+    const fontSize = 15;
+    const characters = "01アイウエオカキクケコ";
+    const reducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)"
+    );
+
+    let drops = [];
+    let rainTimer = null;
+
+    function resizeCanvas() {
+      const ratio = Math.min(
+        window.devicePixelRatio || 1,
+        2
+      );
+
+      canvas.width = Math.floor(
+        window.innerWidth * ratio
+      );
+
+      canvas.height = Math.floor(
+        window.innerHeight * ratio
+      );
+
+      context.setTransform(
+        ratio, 0, 0, ratio, 0, 0
+      );
+
+      const columns = Math.ceil(
+        window.innerWidth / fontSize
+      );
+
+      drops = Array.from(
+        { length: columns },
+        () => Math.random() * -50
+      );
+
+      context.fillStyle = "#030806";
+      context.fillRect(
+        0, 0,
+        window.innerWidth,
+        window.innerHeight
+      );
+    }
+
+    function drawRain() {
+      context.fillStyle = "rgba(3, 8, 6, 0.09)";
+      context.fillRect(
+        0, 0,
+        window.innerWidth,
+        window.innerHeight
+      );
+
+      context.font = fontSize + "px monospace";
+      context.fillStyle = "#4fe279";
+
+      for (let i = 0; i < drops.length; i++) {
+        const character = characters[
+          Math.floor(
+            Math.random() * characters.length
+          )
+        ];
+
+        const x = i * fontSize;
+        const y = drops[i] * fontSize;
+
+        context.fillText(character, x, y);
+
+        if (
+          y > window.innerHeight &&
+          Math.random() > 0.975
+        ) {
+          drops[i] = 0;
+        } else {
+          drops[i]++;
+        }
+      }
+    }
+
+    function updateRain() {
+      if (rainTimer !== null) {
+        window.clearInterval(rainTimer);
+        rainTimer = null;
+      }
+
+      resizeCanvas();
+
+      if (!reducedMotion.matches) {
+        rainTimer = window.setInterval(
+          drawRain,
+          55
+        );
+      }
+    }
+
+    window.addEventListener("resize", resizeCanvas);
+
+    reducedMotion.addEventListener(
+      "change",
+      updateRain
+    );
+
+    updateRain();
+  </script>
+
+</body>
+</html>
