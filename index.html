@@ -268,6 +268,14 @@
 
   <p class="subtitle">CHOOSE YOUR CHARACTER</p>
   <div id="message" role="status" aria-live="polite"></div>
+  
+  <div id="ending">
+    <p>Every ending is another beginning.</p>
+    <button id="play-again" type="button">
+      ↻ PLAY AGAIN
+    </button>
+  </div>
+
 </main>
 
 <script>
@@ -365,18 +373,58 @@
     heroes.style.display = "none";
     message.classList.add("revelation");
 
-    await reveal("YOU CHOSE A CHARACTER.");
-    await reveal("BUT WHO CHOSE THE GAME?", 3200);
-    await reveal("YOU'RE THE PLAYER.", 2500);
+    await reveal("YOU CHOSE A CHARACTER");
+    await reveal("BUT WHO CHOSE THE GAME ?", 3200);
+    await reveal("YOU'RE THE PLAYER", 2500);
     await reveal("NOT THE CHARACTER.", 3200);
     await reveal("DON'T FORGET TO LOVE YOURSELF ❤️", 5000);
   }
+ 
+   // Show the replay option
+   const ending = document.getElementById("ending");
+
+   ending.style.display = "flex";
+
+   requestAnimationFrame(() => {
+     ending.classList.add("visible");
+   });
 
   cards.forEach(card => {
     card.addEventListener("click", () => {
       selectCharacter(card);
     });
   });
+ 
+ // PLAY AGAIN — reset without reloading
+ 
+ document.getElementById("play-again")
+   .addEventListener("click", async () => {
+ 
+     const ending = document.getElementById("ending");
+ 
+     ending.classList.remove("visible");
+     message.style.opacity = "0";
+ 
+     await wait(700);
+ 
+     ending.style.display = "none";
+     message.textContent = "";
+     message.classList.remove("revelation");
+     message.style.opacity = "1";
+ 
+     heroes.style.display = "grid";
+     heroes.classList.remove("has-selection", "vanish");
+ 
+     cards.forEach(card => {
+       card.classList.remove("selected");
+     });
+ 
+     subtitle.textContent = "CHOOSE YOUR CHARACTER";
+     subtitle.style.opacity = "1";
+ 
+     playing = false;
+ });
+
 
 </script>
 </body>
