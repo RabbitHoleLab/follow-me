@@ -1,154 +1,707 @@
+
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Follow Me | RabbitHoleLab</title>
-<style>
-  * { box-sizing: border-box; }
-  body { margin: 0; min-height: 100vh; background: #020907; color: #e1ffe9; font-family: Arial, sans-serif; }
-  #matrix { position: fixed; inset: 0; width: 100%; height: 100%; opacity: .65; pointer-events: none; }
-  main { position: relative; z-index: 1; min-height: 100vh; padding: 42px 20px; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 28px; text-align: center; }
-  h1 { margin: 0 0 28px; font-size: clamp(23px, 3.6vw, 43px); letter-spacing: 3px; text-shadow: 0 0 22px #18a755; }
-  .heroes { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 18px; width: min(1100px, 100%); transition: opacity 1s ease, transform 1s ease; }
-  .hero { position: relative; min-width: 0; overflow: hidden; padding: 0; border: 2px solid var(--accent); border-radius: 13px; background: #06100c; color: white; cursor: pointer; box-shadow: 0 0 15px var(--glow); transition: transform .5s ease, box-shadow .5s ease, opacity .7s ease, filter .7s ease; }
-  .hero.blue { --accent: #51baff; --glow: rgba(40, 150, 255, .3); }
-  .hero.red { --accent: #ff5a55; --glow: rgba(255, 50, 40, .3); }
-  .hero:hover, .hero:focus-visible { transform: translateY(-9px) scale(1.025); box-shadow: 0 0 35px var(--accent); outline: none; }
-  .hero:focus-visible { outline: 2px solid #e1ffe9; outline-offset: 3px; }
-  .hero img { display: block; width: 100%; aspect-ratio: 1 / 1.5; object-fit: cover; object-position: center top; }
-  .hero-name { display: block; padding: 14px 5px; background: rgba(0, 0, 0, .88); font-family: Georgia, serif; font-size: clamp(12px, 1.5vw, 20px); letter-spacing: 1px; }
-  .subtitle { margin: 0; color: #8de4a4; letter-spacing: 2px; transition: opacity .5s ease; }
-  #message { min-height: 28px; color: #e1ffe9; font-size: 18px; text-shadow: 0 0 15px #18a755; transition: opacity .5s ease; }
-  #message.revelation { font-size: clamp(22px, 3vw, 38px); font-weight: bold; letter-spacing: 2px; text-shadow: 0 0 25px #57d98b; }
-  .heroes.has-selection .hero:not(.selected) { opacity: .15; filter: grayscale(1); transform: scale(.94); }
-  .heroes.has-selection .hero.selected, .heroes.has-selection .hero.selected:hover { transform: scale(1.06); box-shadow: 0 0 25px var(--accent), 0 0 65px var(--glow); z-index: 2; }
-  .heroes.vanish { opacity: 0; transform: scale(.94); pointer-events: none; }
-  #ending { display: none; opacity: 0; flex-direction: column; align-items: center; gap: 22px; transition: opacity 1s ease; }
-  #ending.visible { opacity: 1; }
-  #ending p { margin: 0; color: #9bcfac; font-family: Georgia, serif; font-style: italic; font-size: clamp(15px, 2vw, 21px); letter-spacing: 1px; }
-  #play-again { padding: 13px 32px; border: 1px solid #57d98b; border-radius: 30px; background: rgba(0, 20, 10, .8); color: #caffd8; font-size: 14px; letter-spacing: 3px; cursor: pointer; transition: background .3s, box-shadow .3s, transform .3s; }
-  #play-again:hover, #play-again:focus-visible { background: rgba(25, 90, 45, .5); box-shadow: 0 0 25px #57d98b; transform: scale(1.06); }
-  @media (max-width: 700px) { main { padding: 30px 14px; gap: 20px; } h1 { margin-bottom: 24px; } .heroes { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; max-width: 460px; } .hero-name { font-size: 13px; padding: 11px 3px; } }
-  @media (prefers-reduced-motion: reduce) { .hero, .heroes, #ending, #message, .subtitle, #play-again { transition: none; } }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Follow Me | RabbitHoleLab</title>
+
+  <style>
+
+    /* ==========================================
+       GENERAL
+    ========================================== */
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: #020907;
+      color: #e1ffe9;
+      font-family: Arial, sans-serif;
+    }
+
+    #matrix {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      opacity: .65;
+      pointer-events: none;
+    }
+
+    main {
+      position: relative;
+      z-index: 1;
+      min-height: 100vh;
+      padding: 42px 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 28px;
+      text-align: center;
+    }
+
+
+    /* ==========================================
+       TITLE
+    ========================================== */
+
+    h1 {
+      margin: 0 0 28px;
+      font-size: clamp(23px, 3.6vw, 43px);
+      letter-spacing: 3px;
+      text-shadow: 0 0 22px #18a755;
+    }
+
+
+    /* ==========================================
+       CHARACTER GRID
+    ========================================== */
+
+    .heroes {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 18px;
+      width: min(1100px, 100%);
+
+      transition:
+        opacity 1s ease,
+        transform 1s ease;
+    }
+
+    .hero {
+      position: relative;
+      min-width: 0;
+      overflow: hidden;
+      padding: 0;
+
+      border: 2px solid var(--accent);
+      border-radius: 13px;
+
+      background: #06100c;
+      color: white;
+      cursor: pointer;
+
+      box-shadow: 0 0 15px var(--glow);
+
+      transition:
+        transform .5s ease,
+        box-shadow .5s ease,
+        opacity .7s ease,
+        filter .7s ease;
+    }
+
+
+    /* Character colors */
+
+    .hero.blue {
+      --accent: #51baff;
+      --glow: rgba(40, 150, 255, .3);
+    }
+
+    .hero.red {
+      --accent: #ff5a55;
+      --glow: rgba(255, 50, 40, .3);
+    }
+
+
+    /* Hover effects */
+
+    .hero:hover,
+    .hero:focus-visible {
+      transform: translateY(-9px) scale(1.025);
+      box-shadow: 0 0 35px var(--accent);
+      outline: none;
+    }
+
+    .hero:focus-visible {
+      outline: 2px solid #e1ffe9;
+      outline-offset: 3px;
+    }
+
+
+    /* Character portraits */
+
+    .hero img {
+      display: block;
+      width: 100%;
+      aspect-ratio: 1 / 1.5;
+      object-fit: cover;
+      object-position: center top;
+    }
+
+
+    /* Character names */
+
+    .hero-name {
+      display: block;
+      padding: 14px 5px;
+
+      background: rgba(0, 0, 0, .88);
+
+      font-family: Georgia, serif;
+      font-size: clamp(12px, 1.5vw, 20px);
+      letter-spacing: 1px;
+    }
+
+
+    /* ==========================================
+       SUBTITLE AND MESSAGES
+    ========================================== */
+
+    .subtitle {
+      margin: 0;
+      color: #8de4a4;
+      letter-spacing: 2px;
+      transition: opacity .5s ease;
+    }
+
+    #message {
+      min-height: 28px;
+      color: #e1ffe9;
+      font-size: 18px;
+      text-shadow: 0 0 15px #18a755;
+      transition: opacity .5s ease;
+    }
+
+    #message.revelation {
+      font-size: clamp(22px, 3vw, 38px);
+      font-weight: bold;
+      letter-spacing: 2px;
+      text-shadow: 0 0 25px #57d98b;
+    }
+
+
+    /* ==========================================
+       CHARACTER SELECTION ANIMATION
+    ========================================== */
+
+    .heroes.has-selection .hero:not(.selected) {
+      opacity: .15;
+      filter: grayscale(1);
+      transform: scale(.94);
+    }
+
+    .heroes.has-selection .hero.selected,
+    .heroes.has-selection .hero.selected:hover {
+      transform: scale(1.06);
+
+      box-shadow:
+        0 0 25px var(--accent),
+        0 0 65px var(--glow);
+
+      z-index: 2;
+    }
+
+    .heroes.vanish {
+      opacity: 0;
+      transform: scale(.94);
+      pointer-events: none;
+    }
+
+
+    /* ==========================================
+       END SCREEN
+    ========================================== */
+
+    #ending {
+      display: none;
+      opacity: 0;
+
+      flex-direction: column;
+      align-items: center;
+      gap: 22px;
+
+      transition: opacity 1s ease;
+    }
+
+    #ending.visible {
+      opacity: 1;
+    }
+
+    #ending p {
+      margin: 0;
+      color: #9bcfac;
+
+      font-family: Georgia, serif;
+      font-style: italic;
+      font-size: clamp(15px, 2vw, 21px);
+      letter-spacing: 1px;
+    }
+
+
+    /* ==========================================
+       PLAY AGAIN BUTTON
+    ========================================== */
+
+    #play-again {
+      padding: 13px 32px;
+
+      border: 1px solid #57d98b;
+      border-radius: 30px;
+
+      background: rgba(0, 20, 10, .8);
+      color: #caffd8;
+
+      font-size: 14px;
+      letter-spacing: 3px;
+      cursor: pointer;
+
+      transition:
+        background .3s,
+        box-shadow .3s,
+        transform .3s;
+    }
+
+    #play-again:hover,
+    #play-again:focus-visible {
+      background: rgba(25, 90, 45, .5);
+      box-shadow: 0 0 25px #57d98b;
+      transform: scale(1.06);
+    }
+
+
+    /* ==========================================
+       RESPONSIVE — MOBILE
+    ========================================== */
+
+    @media (max-width: 700px) {
+
+      main {
+        padding: 30px 14px;
+        gap: 20px;
+      }
+
+      h1 {
+        margin-bottom: 24px;
+      }
+
+      .heroes {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+        max-width: 460px;
+      }
+
+      .hero-name {
+        font-size: 13px;
+        padding: 11px 3px;
+      }
+
+    }
+
+
+    /* ==========================================
+       ACCESSIBILITY
+    ========================================== */
+
+    @media (prefers-reduced-motion: reduce) {
+
+      .hero,
+      .heroes,
+      #ending,
+      #message,
+      .subtitle,
+      #play-again {
+        transition: none;
+      }
+
+    }
+
+  </style>
 </head>
+
+
 <body>
-<canvas id="matrix" aria-hidden="true"></canvas>
-<main>
-  <h1>WHAT KIND OF PLAYER ARE YOU ?</h1>
-  <section class="heroes" aria-label="Choose your character">
-    <button type="button" class="hero blue" data-name="THE GUARDIAN"><img src="assets/images/guardian.webp" alt="The Guardian"><span class="hero-name">THE GUARDIAN</span></button>
-    <button type="button" class="hero blue" data-name="THE DREAMER"><img src="assets/images/dreamer.webp" alt="The Dreamer"><span class="hero-name">THE DREAMER</span></button>
-    <button type="button" class="hero red" data-name="THE REBEL"><img src="assets/images/rebel.webp" alt="The Rebel"><span class="hero-name">THE REBEL</span></button>
-    <button type="button" class="hero red" data-name="THE SEEKER"><img src="assets/images/seeker.webp" alt="The Seeker"><span class="hero-name">THE SEEKER</span></button>
-  </section>
-  <p class="subtitle">CHOOSE YOUR CHARACTER</p>
-  <div id="message" role="status" aria-live="polite"></div>
-  <div id="ending">
-    <p>Every ending is another beginning</p>
-    <button id="play-again" type="button">↻ PLAY AGAIN</button>
-  </div>
-</main>
-<script>
-  // MATRIX RAIN
-  const canvas = document.getElementById("matrix");
-  const ctx = canvas.getContext("2d");
-  const fontSize = 16;
-  const chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZアイウエオカキクケコ";
-  let drops = [];
-  let width, height;
-  function resize() {
-    const dpr = Math.min(devicePixelRatio || 1, 2);
-    width = innerWidth;
-    height = innerHeight;
-    canvas.width = width * dpr;
-    canvas.height = height * dpr;
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    drops = Array.from({ length: Math.ceil(width / fontSize) }, () => Math.random() * -60);
-    ctx.fillStyle = "#020907";
-    ctx.fillRect(0, 0, width, height);
-  }
-  function draw() {
-    ctx.fillStyle = "rgba(2,9,7,.12)";
-    ctx.fillRect(0, 0, width, height);
-    ctx.font = fontSize + "px monospace";
-    ctx.fillStyle = "#57d98b";
-    drops.forEach((drop, i) => {
-      const char = chars[Math.floor(Math.random() * chars.length)];
-      ctx.fillText(char, i * fontSize, drop * fontSize);
-      drops[i] = drop * fontSize > height && Math.random() > .98 ? 0 : drop + .48;
+
+  <!-- ========================================
+       MATRIX BACKGROUND
+  ========================================= -->
+
+  <canvas id="matrix" aria-hidden="true"></canvas>
+
+
+  <!-- ========================================
+       MAIN CONTENT
+  ========================================= -->
+
+  <main>
+
+    <h1>WHAT KIND OF PLAYER ARE YOU ?</h1>
+
+
+    <!-- CHARACTER SELECTION -->
+
+    <section class="heroes" aria-label="Choose your character">
+
+      <button
+        type="button"
+        class="hero blue"
+        data-name="THE GUARDIAN"
+      >
+        <img
+          src="assets/images/guardian.webp"
+          alt="The Guardian"
+        >
+        <span class="hero-name">THE GUARDIAN</span>
+      </button>
+
+
+      <button
+        type="button"
+        class="hero blue"
+        data-name="THE DREAMER"
+      >
+        <img
+          src="assets/images/dreamer.webp"
+          alt="The Dreamer"
+        >
+        <span class="hero-name">THE DREAMER</span>
+      </button>
+
+
+      <button
+        type="button"
+        class="hero red"
+        data-name="THE REBEL"
+      >
+        <img
+          src="assets/images/rebel.webp"
+          alt="The Rebel"
+        >
+        <span class="hero-name">THE REBEL</span>
+      </button>
+
+
+      <button
+        type="button"
+        class="hero red"
+        data-name="THE SEEKER"
+      >
+        <img
+          src="assets/images/seeker.webp"
+          alt="The Seeker"
+        >
+        <span class="hero-name">THE SEEKER</span>
+      </button>
+
+    </section>
+
+
+    <!-- SUBTITLE -->
+
+    <p class="subtitle">CHOOSE YOUR CHARACTER</p>
+
+
+    <!-- REVELATION MESSAGES -->
+
+    <div
+      id="message"
+      role="status"
+      aria-live="polite"
+    ></div>
+
+
+    <!-- END SCREEN -->
+
+    <div id="ending">
+
+      <p>Every ending is another beginning</p>
+
+      <button id="play-again" type="button">
+        ↻ PLAY AGAIN
+      </button>
+
+    </div>
+
+  </main>
+
+
+  <script>
+
+    /* ==========================================
+       MATRIX RAIN
+    ========================================== */
+
+    const canvas = document.getElementById("matrix");
+    const ctx = canvas.getContext("2d");
+
+    const fontSize = 16;
+
+    const chars =
+      "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZアイウエオカキクケコ";
+
+    let drops = [];
+    let width, height;
+
+
+    // Resize canvas
+
+    function resize() {
+
+      const dpr = Math.min(devicePixelRatio || 1, 2);
+
+      width = innerWidth;
+      height = innerHeight;
+
+      canvas.width = width * dpr;
+      canvas.height = height * dpr;
+
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+      drops = Array.from(
+        { length: Math.ceil(width / fontSize) },
+        () => Math.random() * -60
+      );
+
+      ctx.fillStyle = "#020907";
+      ctx.fillRect(0, 0, width, height);
+
+    }
+
+
+    // Draw Matrix rain
+
+    function draw() {
+
+      ctx.fillStyle = "rgba(2,9,7,.12)";
+      ctx.fillRect(0, 0, width, height);
+
+      ctx.font = fontSize + "px monospace";
+      ctx.fillStyle = "#57d98b";
+
+      drops.forEach((drop, i) => {
+
+        const char =
+          chars[Math.floor(Math.random() * chars.length)];
+
+        ctx.fillText(
+          char,
+          i * fontSize,
+          drop * fontSize
+        );
+
+        drops[i] =
+          drop * fontSize > height && Math.random() > .98
+            ? 0
+            : drop + .48;
+
+      });
+
+    }
+
+
+    // Initialize Matrix
+
+    addEventListener("resize", resize);
+
+    resize();
+
+    if (!matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      setInterval(draw, 55);
+    } else {
+      draw();
+    }
+
+
+    /* ==========================================
+       CHARACTER SELECTION
+    ========================================== */
+
+    const heroes = document.querySelector(".heroes");
+    const cards = document.querySelectorAll(".hero");
+
+    const message = document.getElementById("message");
+    const subtitle = document.querySelector(".subtitle");
+
+    const ending = document.getElementById("ending");
+    const replay = document.getElementById("play-again");
+
+    const reducedMotion =
+      matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    let playing = false;
+
+
+    // Wait helper
+
+    const wait = ms =>
+      new Promise(resolve =>
+        setTimeout(resolve, reducedMotion ? 0 : ms)
+      );
+
+
+    /* ==========================================
+       REVELATION TEXT
+    ========================================== */
+
+    async function reveal(text, duration = 2600) {
+
+      message.style.opacity = "0";
+
+      await wait(500);
+
+      message.textContent = text;
+      message.style.opacity = "1";
+
+      await wait(duration);
+
+    }
+
+
+    /* ==========================================
+       SELECT CHARACTER
+    ========================================== */
+
+    async function selectCharacter(card) {
+
+      if (playing) return;
+
+      playing = true;
+
+      // Highlight selected character
+
+      heroes.classList.add("has-selection");
+      card.classList.add("selected");
+
+      subtitle.textContent = "CHARACTER SELECTED";
+
+      await wait(1900);
+
+
+      // Make characters disappear
+
+      heroes.classList.add("vanish");
+      subtitle.style.opacity = "0";
+
+      await wait(1200);
+
+      heroes.style.display = "none";
+
+      message.classList.add("revelation");
+
+
+      // Philosophical revelation
+
+      await reveal("YOU CHOSE A CHARACTER");
+
+      await reveal(
+        "BUT WHO CHOSE THE GAME ?",
+        3200
+      );
+
+      await reveal(
+        "YOU'RE THE PLAYER",
+        2500
+      );
+
+      await reveal(
+        "NOT THE CHARACTER",
+        3200
+      );
+
+      await reveal(
+        "DON'T FORGET TO LOVE YOURSELF ❤️",
+        5000
+      );
+
+
+      // Show replay option
+
+      ending.style.display = "flex";
+
+      requestAnimationFrame(() =>
+        requestAnimationFrame(() =>
+          ending.classList.add("visible")
+        )
+      );
+
+    }
+
+
+    // Character click events
+
+    cards.forEach(card => {
+
+      card.addEventListener("click", () => {
+        selectCharacter(card);
+      });
+
     });
-  }
-  addEventListener("resize", resize);
-  resize();
-  if (!matchMedia("(prefers-reduced-motion: reduce)").matches) setInterval(draw, 55);
-  else draw();
 
-  // CHARACTER SELECTION
-  const heroes = document.querySelector(".heroes");
-  const cards = document.querySelectorAll(".hero");
-  const message = document.getElementById("message");
-  const subtitle = document.querySelector(".subtitle");
-  const ending = document.getElementById("ending");
-  const replay = document.getElementById("play-again");
-  const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
-  let playing = false;
-  const wait = ms => new Promise(resolve => setTimeout(resolve, reducedMotion ? 0 : ms));
 
-  async function reveal(text, duration = 2600) {
-    message.style.opacity = "0";
-    await wait(500);
-    message.textContent = text;
-    message.style.opacity = "1";
-    await wait(duration);
-  }
+    /* ==========================================
+       PLAY AGAIN — RESET GAME
+    ========================================== */
 
-  async function selectCharacter(card) {
-    if (playing) return;
-    playing = true;
-    heroes.classList.add("has-selection");
-    card.classList.add("selected");
-    subtitle.textContent = "CHARACTER SELECTED";
-    await wait(1900);
-    heroes.classList.add("vanish");
-    subtitle.style.opacity = "0";
-    await wait(1200);
-    heroes.style.display = "none";
-    message.classList.add("revelation");
-    await reveal("YOU CHOSE A CHARACTER");
-    await reveal("BUT WHO CHOSE THE GAME ?", 3200);
-    await reveal("YOU'RE THE PLAYER", 2500);
-    await reveal("NOT THE CHARACTER", 3200);
-    await reveal("DON'T FORGET TO LOVE YOURSELF ❤️", 5000);
-    ending.style.display = "flex";
-    // Ensure the browser sees the hidden state before fading in
-    requestAnimationFrame(() => requestAnimationFrame(() => ending.classList.add("visible")));
-  }
+    replay.addEventListener("click", async () => {
 
-  cards.forEach(card => card.addEventListener("click", () => selectCharacter(card)));
+      if (
+        !playing ||
+        !ending.classList.contains("visible")
+      ) {
+        return;
+      }
 
-  // PLAY AGAIN — reset without reloading
-  replay.addEventListener("click", async () => {
-    if (!playing || !ending.classList.contains("visible")) return;
-    replay.disabled = true;
-    ending.classList.remove("visible");
-    message.style.opacity = "0";
-    await wait(1000);
-    ending.style.display = "none";
-    message.textContent = "";
-    message.classList.remove("revelation");
-    message.style.opacity = "1";
-    cards.forEach(card => card.classList.remove("selected"));
-    heroes.classList.remove("has-selection");
-    heroes.style.display = "grid";
-    // Start hidden, then fade the cards back into view
-    requestAnimationFrame(() => requestAnimationFrame(() => heroes.classList.remove("vanish")));
-    subtitle.textContent = "CHOOSE YOUR CHARACTER";
-    subtitle.style.opacity = "1";
-    replay.disabled = false;
-    playing = false;
-  });
-</script>
+      replay.disabled = true;
+
+
+      // Hide ending
+
+      ending.classList.remove("visible");
+      message.style.opacity = "0";
+
+      await wait(1000);
+
+      ending.style.display = "none";
+
+
+      // Reset revelation
+
+      message.textContent = "";
+      message.classList.remove("revelation");
+      message.style.opacity = "1";
+
+
+      // Reset characters
+
+      cards.forEach(card => {
+        card.classList.remove("selected");
+      });
+
+      heroes.classList.remove("has-selection");
+      heroes.style.display = "grid";
+
+
+      // Fade characters back in
+
+      requestAnimationFrame(() =>
+        requestAnimationFrame(() =>
+          heroes.classList.remove("vanish")
+        )
+      );
+
+
+      // Reset subtitle
+
+      subtitle.textContent = "CHOOSE YOUR CHARACTER";
+      subtitle.style.opacity = "1";
+
+
+      // Unlock game
+
+      replay.disabled = false;
+      playing = false;
+
+    });
+
+  </script>
+
 </body>
 </html>
