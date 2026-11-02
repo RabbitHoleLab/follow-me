@@ -57,6 +57,51 @@
     letter-spacing: 3px;
     text-shadow: 0 0 22px #18a755;
   }
+ 
+   /* END SCREEN */
+   
+   #ending {
+     display: none;
+     opacity: 0;
+     flex-direction: column;
+     align-items: center;
+     gap: 22px;
+     transition: opacity 1s ease;
+   }
+   
+   #ending.visible {
+     opacity: 1;
+   }
+   
+   #ending p {
+     color: #9bcfac;
+     font-family: Georgia, serif;
+     font-style: italic;
+     font-size: clamp(15px, 2vw, 21px);
+     letter-spacing: 1px;
+   }
+   
+   #play-again {
+     padding: 13px 32px;
+     border: 1px solid #57d98b;
+     border-radius: 30px;
+     background: rgba(0, 20, 10, .8);
+     color: #caffd8;
+     font-size: 14px;
+     letter-spacing: 3px;
+     cursor: pointer;
+     transition:
+       background .3s,
+       box-shadow .3s,
+       transform .3s;
+   }
+   
+   #play-again:hover {
+     background: rgba(25, 90, 45, .5);
+     box-shadow: 0 0 25px #57d98b;
+     transform: scale(1.06);
+   }
+
 
   .heroes {
     display: grid;
