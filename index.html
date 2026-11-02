@@ -687,6 +687,33 @@
       main.classList.add("revelation-mode");
       
       message.classList.add("revelation");
+      
+      /* ==========================================
+         ENDLESS LOOP — AFTER THE ANOMALY
+      ========================================== */
+      
+      // The player has already completed
+      // the three introductory journeys
+      
+      if (attemptCount >= 3) {
+      
+        // Only one message remains
+        await reveal(
+          "DO YOU REALLY ONLY WANT THAT ?",
+          5000
+        );
+      
+        // Show PLAY AGAIN
+        requestAnimationFrame(() =>
+          requestAnimationFrame(() =>
+            ending.classList.add("visible")
+          )
+        );
+      
+        // Stop here: skip all original revelations
+        return;
+      
+      }
 
       // ==========================================
       // PHILOSOPHICAL REVELATION
