@@ -1,0 +1,511 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>RESTRICTED ACCESS // LEVEL 7</title>
+
+  <style>
+    /* ========================================
+       BASE
+       ======================================== */
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: #020603;
+      color: #9cffb0;
+      font-family: Consolas, "Courier New", monospace;
+      overflow: hidden;
+    }
+
+    /* ========================================
+       MATRIX RAIN
+       ======================================== */
+
+    #matrix {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      opacity: 0.35;
+    }
+
+    /* ========================================
+       TERMINAL
+       ======================================== */
+
+    .screen {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 24px;
+    }
+
+    .terminal {
+      width: min(100%, 560px);
+      padding: 38px 30px;
+      background: rgba(0, 10, 4, 0.92);
+      border: 1px solid #28763d;
+      box-shadow:
+        0 0 20px rgba(0, 255, 75, 0.12),
+        inset 0 0 35px rgba(0, 255, 75, 0.04);
+      text-align: center;
+    }
+
+    .lock {
+      font-size: 42px;
+      margin-bottom: 20px;
+    }
+
+    .warning {
+      color: #ff5151;
+      font-size: clamp(18px, 4vw, 25px);
+      letter-spacing: 2px;
+      text-shadow: 0 0 12px #8b0000;
+    }
+
+    .level {
+      color: #719b7a;
+      margin: 12px 0 28px;
+      font-size: 12px;
+      letter-spacing: 3px;
+    }
+
+    .description {
+      color: #b0cdb5;
+      line-height: 1.8;
+      font-size: 14px;
+    }
+
+    /* ========================================
+       PASSWORD FORM
+       ======================================== */
+
+    form {
+      margin-top: 30px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 12px;
+      font-size: 12px;
+      letter-spacing: 2px;
+    }
+
+    input {
+      width: 100%;
+      padding: 15px;
+      background: #020603;
+      color: #9cffb0;
+      border: 1px solid #28763d;
+      outline: none;
+      font-family: inherit;
+      font-size: 16px;
+      text-align: center;
+    }
+
+    input:focus {
+      border-color: #9cffb0;
+      box-shadow: 0 0 12px rgba(0, 255, 75, 0.2);
+    }
+
+    button {
+      width: 100%;
+      margin-top: 16px;
+      padding: 15px;
+      border: 1px solid #3baf58;
+      background: #071b0d;
+      color: #9cffb0;
+      font-family: inherit;
+      font-size: 13px;
+      letter-spacing: 2px;
+      cursor: pointer;
+      transition: 0.25s;
+    }
+
+    button:hover {
+      background: #123d1d;
+      box-shadow: 0 0 18px rgba(0, 255, 75, 0.2);
+    }
+
+    button:disabled {
+      opacity: 0.5;
+      cursor: wait;
+    }
+
+    /* ========================================
+       STATUS AND REVEAL
+       ======================================== */
+
+    .status {
+      min-height: 26px;
+      margin-top: 22px;
+      color: #9cffb0;
+      font-size: 12px;
+      letter-spacing: 1px;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .reveal {
+      animation: appear 0.8s ease both;
+    }
+
+    .reveal h2 {
+      color: #9cffb0;
+      letter-spacing: 2px;
+    }
+
+    .reveal p {
+      color: #c4d5c8;
+      line-height: 1.9;
+    }
+
+    .punchline {
+      color: #ff7777 !important;
+      font-size: clamp(18px, 4vw, 24px);
+      font-weight: bold;
+      margin: 28px 0;
+    }
+
+    .small {
+      font-size: 12px;
+      color: #76977e !important;
+    }
+
+    @keyframes appear {
+      from {
+        opacity: 0;
+        transform: translateY(12px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (max-width: 480px) {
+      .terminal {
+        padding: 28px 18px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Matrix background -->
+  <canvas id="matrix"></canvas>
+
+  <main class="screen">
+
+    <section class="terminal">
+
+      <!-- INITIAL LOGIN SCREEN -->
+      <div id="loginScreen">
+
+        <div class="lock">🔒</div>
+
+        <h1 class="warning">
+          RESTRICTED ACCESS
+        </h1>
+
+        <div class="level">
+          SECURITY CLEARANCE // LEVEL 7
+        </div>
+
+        <p class="description">
+          This area is not part of the game.<br>
+          Unauthorized access is prohibited.<br>
+          All attempts are being monitored.
+        </p>
+
+        <form id="loginForm">
+
+          <label for="password">
+            ENTER ADMIN PASSWORD
+          </label>
+
+          <input
+            id="password"
+            type="password"
+            placeholder="••••••••••"
+            autocomplete="off"
+            required
+          >
+
+          <button id="accessButton" type="submit">
+            AUTHENTICATE
+          </button>
+
+        </form>
+
+        <div id="status" class="status"></div>
+
+      </div>
+
+      <!-- FAKE ACCESS GRANTED SCREEN -->
+      <div id="revealScreen" class="reveal hidden">
+
+        <div class="lock">🔓</div>
+
+        <h2>ACCESS GRANTED</h2>
+
+        <p>
+          CONGRATULATIONS.
+        </p>
+
+        <p>
+          YOU HAVE SUCCESSFULLY ENTERED<br>
+          A RANDOM PASSWORD.
+        </p>
+
+        <p class="punchline">
+          WE DIDN'T EVEN CHECK IT.
+        </p>
+
+        <p>
+          YOU REALLY THOUGHT YOU WERE<br>
+          HACKING SOMETHING?
+        </p>
+
+        <h2>ADORABLE.</h2>
+
+        <p class="small">
+          Curiosity level: concerning.
+        </p>
+
+        <button id="exitButton" type="button">
+          CONTINUE TO THE EXIT →
+        </button>
+
+      </div>
+
+      <!-- SECOND REVEAL -->
+      <div id="exitScreen" class="reveal hidden">
+
+        <div class="lock">🚪</div>
+
+        <h2>EXIT PROTOCOL</h2>
+
+        <p>
+          You found a door.
+        </p>
+
+        <p>
+          Someone put it here.
+        </p>
+
+        <p class="punchline">
+          AND YOU FOLLOWED IT.
+        </p>
+
+        <p>
+          An exit provided by the system<br>
+          is still part of the system.
+        </p>
+
+        <button id="restartButton" type="button">
+          TRY AGAIN
+        </button>
+
+      </div>
+
+    </section>
+
+  </main>
+
+  <script>
+    /* ========================================
+       MATRIX RAIN
+       ======================================== */
+
+    const canvas = document.getElementById("matrix");
+    const ctx = canvas.getContext("2d");
+
+    const characters =
+      "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+
+    const fontSize = 15;
+
+    let columns = [];
+    let animationId;
+    let lastFrame = 0;
+
+    function resizeMatrix() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+
+      const columnCount = Math.ceil(
+        canvas.width / fontSize
+      );
+
+      columns = Array.from(
+        { length: columnCount },
+        () => Math.random() * -100
+      );
+
+      ctx.fillStyle = "#020603";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+    }
+
+    function drawMatrix(timestamp) {
+
+      animationId = requestAnimationFrame(drawMatrix);
+
+      // Limit updates to approximately 30 FPS.
+      if (timestamp - lastFrame < 33) {
+        return;
+      }
+
+      lastFrame = timestamp;
+
+      ctx.fillStyle = "rgba(2, 6, 3, 0.08)";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      ctx.fillStyle = "#37c65b";
+      ctx.font = `${fontSize}px monospace`;
+
+      columns.forEach((position, index) => {
+
+        const character = characters[
+          Math.floor(Math.random() * characters.length)
+        ];
+
+        const x = index * fontSize;
+        const y = position * fontSize;
+
+        ctx.fillText(character, x, y);
+
+        if (
+          y > canvas.height &&
+          Math.random() > 0.975
+        ) {
+          columns[index] = 0;
+        } else {
+          columns[index] += 0.6;
+        }
+
+      });
+    }
+
+    resizeMatrix();
+    requestAnimationFrame(drawMatrix);
+
+    window.addEventListener("resize", resizeMatrix);
+
+    /* ========================================
+       FAKE AUTHENTICATION
+       ======================================== */
+
+    const loginForm =
+      document.getElementById("loginForm");
+
+    const loginScreen =
+      document.getElementById("loginScreen");
+
+    const revealScreen =
+      document.getElementById("revealScreen");
+
+    const exitScreen =
+      document.getElementById("exitScreen");
+
+    const accessButton =
+      document.getElementById("accessButton");
+
+    const status =
+      document.getElementById("status");
+
+    const exitButton =
+      document.getElementById("exitButton");
+
+    const restartButton =
+      document.getElementById("restartButton");
+
+    // This is intentionally a theatrical puzzle.
+    // No password is checked or transmitted.
+    // The entered value is never stored.
+
+    loginForm.addEventListener("submit", (event) => {
+
+      event.preventDefault();
+
+      accessButton.disabled = true;
+
+      const messages = [
+        "VERIFYING CREDENTIALS...",
+        "CHECKING SECURITY CLEARANCE...",
+        "DECRYPTING ACCESS TOKEN...",
+        "BYPASSING FIREWALL...",
+        "ACCESS GRANTED."
+      ];
+
+      let step = 0;
+
+      function nextMessage() {
+
+        status.textContent = messages[step];
+
+        step++;
+
+        if (step < messages.length) {
+          setTimeout(nextMessage, 650);
+        } else {
+
+          setTimeout(() => {
+
+            loginScreen.classList.add("hidden");
+            revealScreen.classList.remove("hidden");
+
+          }, 900);
+
+        }
+      }
+
+      nextMessage();
+    });
+
+    /* ========================================
+       FAKE EXIT
+       ======================================== */
+
+    exitButton.addEventListener("click", () => {
+
+      revealScreen.classList.add("hidden");
+      exitScreen.classList.remove("hidden");
+
+    });
+
+    /* ========================================
+       RESTART THE TRAP
+       ======================================== */
+
+    restartButton.addEventListener("click", () => {
+
+      exitScreen.classList.add("hidden");
+      loginScreen.classList.remove("hidden");
+
+      loginForm.reset();
+      status.textContent = "";
+      accessButton.disabled = false;
+
+    });
+
+  </script>
+
+</body>
+</html>
