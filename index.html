@@ -173,6 +173,7 @@
 
     .subtitle {
       margin: 0;
+      transform: translateY(15px);
       color: #8de4a4;
       letter-spacing: 2px;
       transition: opacity .5s ease;
@@ -591,13 +592,7 @@
         ? "#51baff"
         : "#ff5a55";
       
-      // Return to Matrix green after 1.5 seconds
-      
-      setTimeout(() => {
-        matrixColor = "#57d98b";
-      }, 1500);
-
-
+     
       // Highlight selected character
 
       heroes.classList.add("has-selection");
@@ -680,6 +675,9 @@
       }
     
       replay.disabled = true;
+
+      // Restore the original Matrix color
+      matrixColor = "#57d98b";
     
       // Hide ending
     
