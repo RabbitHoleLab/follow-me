@@ -559,7 +559,7 @@
        REVELATION TEXT
     ========================================== */
 
-    async function reveal(text, duration = 2600) {
+    async function (text, duration = 2600) {
 
       message.style.opacity = "0";
 
@@ -639,10 +639,15 @@
         3200
       );
 
-      await reveal(
-        "DON'T FORGET TO LOVE YOURSELF ❤️",
-        5000
-      );
+      
+      // Final message depends on the chosen path
+      
+      const finalMessage = card.classList.contains("blue")
+        ? "DON'T FORGET TO LOVE YOURSELF ❤️"
+        : "DO YOU REALLY LOVE YOURSELF ?";
+      
+      await reveal(finalMessage, 5000);
+
 
 
       // Show replay option
