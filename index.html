@@ -607,9 +607,17 @@
       matchMedia("(prefers-reduced-motion: reduce)").matches;
 
     let playing = false;
-
-    // Count completed character journeys
-    let attemptCount = 0;
+    
+    /* ==========================================
+       PLAYER PROGRESSION
+       Saved in the browser
+    ========================================== */
+    
+    const progressKey = "follow-me-progress";
+    
+    let attemptCount = Number(
+      localStorage.getItem(progressKey) || 0
+    );
 
     // Wait helper
 
