@@ -47,16 +47,15 @@
       gap: 28px;
       text-align: center;
     }
-
-
+    
+   
     /* ==========================================
-       TITLE
+       TITLE — FIXED POSITION
     ========================================== */
-
     
     h1 {
       position: absolute;
-      top: 11vh;
+      top: 9vh;
       left: 20px;
       right: 20px;
     
@@ -65,8 +64,14 @@
       font-size: clamp(23px, 3.6vw, 43px);
       letter-spacing: 3px;
       text-shadow: 0 0 22px #18a755;
+    
+      transition: opacity 1.2s ease;
     }
-
+    
+    h1.fade-out {
+      opacity: 0;
+      pointer-events: none;
+    }
 
 
     /* ==========================================
