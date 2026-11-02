@@ -113,6 +113,52 @@
     font-size: 18px;
     text-shadow: 0 0 15px #18a755;
   }
+ 
+  /* Character selection */
+  
+  .heroes {
+    transition: opacity 1s ease, transform 1s ease;
+  }
+  
+  .heroes.has-selection .hero:not(.selected) {
+    opacity: .15;
+    filter: grayscale(1);
+    transform: scale(.94);
+  }
+  
+  .hero {
+    transition:
+      transform .5s ease,
+      box-shadow .5s ease,
+      opacity .7s ease,
+      filter .7s ease;
+  }
+  
+  .hero.selected {
+    transform: scale(1.06);
+    box-shadow:
+      0 0 25px var(--accent),
+      0 0 65px var(--glow);
+    z-index: 2;
+  }
+  
+  .heroes.vanish {
+    opacity: 0;
+    transform: scale(.94);
+    pointer-events: none;
+  }
+  
+  #message {
+    transition: opacity .5s ease;
+  }
+  
+  #message.revelation {
+    font-size: clamp(22px, 3vw, 38px);
+    font-weight: bold;
+    letter-spacing: 2px;
+    text-shadow: 0 0 25px #57d98b;
+  }
+
 
   @media (max-width: 700px) {
     main { padding: 30px 14px; gap: 20px; }
@@ -222,13 +268,59 @@
     draw();
   }
 
-  // CHARACTER SELECTION — temporary test
-  document.querySelectorAll(".hero").forEach(hero => {
-    hero.addEventListener("click", () => {
-      document.getElementById("message").textContent =
-        "YOU CHOSE " + hero.dataset.name + ".";
+  
+  // CHARACTER SELECTION
+  const heroes = document.querySelector(".heroes");
+  const cards = document.querySelectorAll(".hero");
+  const message = document.getElementById("message");
+  const subtitle = document.querySelector(".subtitle");
+
+  let playing = false;
+
+  const wait = ms =>
+    new Promise(resolve => setTimeout(resolve, ms));
+
+  async function reveal(text, duration = 2600) {
+    message.style.opacity = "0";
+    await wait(500);
+
+    message.textContent = text;
+    message.style.opacity = "1";
+
+    await wait(duration);
+  }
+
+  async function selectCharacter(card) {
+    if (playing) return;
+    playing = true;
+
+    heroes.classList.add("has-selection");
+    card.classList.add("selected");
+    subtitle.textContent = "CHARACTER SELECTED";
+
+    await wait(1900);
+
+    heroes.classList.add("vanish");
+    subtitle.style.opacity = "0";
+
+    await wait(1200);
+
+    heroes.style.display = "none";
+    message.classList.add("revelation");
+
+    await reveal("YOU CHOSE A CHARACTER.");
+    await reveal("BUT WHO CHOSE THE GAME?", 3200);
+    await reveal("YOU'RE THE PLAYER.", 2500);
+    await reveal("NOT THE CHARACTER.", 3200);
+    await reveal("DON'T FORGET TO LOVE YOURSELF. ❤️", 5000);
+  }
+
+  cards.forEach(card => {
+    card.addEventListener("click", () => {
+      selectCharacter(card);
     });
   });
+
 </script>
 </body>
 </html>
