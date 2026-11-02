@@ -200,7 +200,41 @@
       transform: scale(.94);
       pointer-events: none;
     }
-
+    
+    /* ==========================================
+       REVELATION — CENTER ON SCREEN
+    ========================================== */
+    
+    main.revelation-mode {
+      justify-content: center;
+    }
+    
+    main.revelation-mode .heroes {
+      position: absolute;
+      visibility: hidden;
+      pointer-events: none;
+    }
+    
+    main.revelation-mode .subtitle {
+      position: absolute;
+      visibility: hidden;
+    }
+    
+    main.revelation-mode #message {
+      position: relative;
+      width: 100%;
+      max-width: 1000px;
+    }
+    
+    main.revelation-mode #ending {
+      position: absolute;
+      top: calc(50% + 75px);
+      left: 50%;
+      transform: translateX(-50%);
+      width: max-content;
+      max-width: calc(100% - 30px);
+    }
+    
     /* ==========================================
        END SCREEN
        Space reserved to prevent layout shifts
@@ -477,10 +511,13 @@
       draw();
     }
 
+    
+
     /* ==========================================
        CHARACTER SELECTION
     ========================================== */
-
+    
+    const main = document.querySelector("main");
     const heroes = document.querySelector(".heroes");
     const cards = document.querySelectorAll(".hero");
 
@@ -564,6 +601,8 @@
 
       heroes.style.visibility = "hidden";
 
+      main.classList.add("revelation-mode");
+      
       message.classList.add("revelation");
 
       // ==========================================
@@ -670,6 +709,8 @@
       message.style.opacity = "0";
 
       await wait(1000);
+
+      main.classList.remove("revelation-mode");
 
       // Reset revelation
 
