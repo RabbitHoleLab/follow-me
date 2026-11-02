@@ -309,9 +309,48 @@
 
     @media (max-width: 700px) {
 
+      /* ==========================================
+         MOBILE — MAIN LAYOUT
+      ========================================== */
+      
       main {
-        padding: 30px 14px;
+        min-height: 100dvh;
+        padding: 35px 14px 45px;
+        justify-content: flex-start;
         gap: 20px;
+      }
+      
+      /* ==========================================
+         MOBILE — TITLE
+      ========================================== */
+      
+      h1 {
+        position: relative;
+        top: auto;
+        left: auto;
+        right: auto;
+      
+        width: 100%;
+        max-width: 420px;
+      
+        margin: 0 0 12px;
+      
+        font-size: clamp(18px, 5vw, 24px);
+        line-height: 1.35;
+        letter-spacing: 1px;
+      }
+      
+      /* ==========================================
+         MOBILE — REVELATION MODE
+      ========================================== */
+      
+      main.revelation-mode {
+        justify-content: center;
+        padding: 30px 14px;
+      }
+      
+      main.revelation-mode h1 {
+        position: absolute;
       }
 
       .heroes {
