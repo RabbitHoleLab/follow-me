@@ -442,6 +442,12 @@
     const ctx = canvas.getContext("2d");
 
     const fontSize = 16;
+    
+    // ==========================================
+    // MATRIX COLOR EFFECT
+    // ==========================================
+    
+    let matrixColor = "#57d98b";
 
     const chars =
       "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZアイウエオカキクケコ";
@@ -483,8 +489,8 @@
       ctx.fillRect(0, 0, width, height);
 
       ctx.font = fontSize + "px monospace";
-      ctx.fillStyle = "#57d98b";
-
+      ctx.fillStyle = matrixColor;
+      
       drops.forEach((drop, i) => {
 
         const char =
@@ -575,6 +581,23 @@
 
       playing = true;
 
+      
+      // ==========================================
+      // MATRIX COLOR FLASH
+      // Blue characters / Red characters
+      // ==========================================
+      
+      matrixColor = card.classList.contains("blue")
+        ? "#51baff"
+        : "#ff5a55";
+      
+      // Return to Matrix green after 1.5 seconds
+      
+      setTimeout(() => {
+        matrixColor = "#57d98b";
+      }, 1500);
+
+
       // Highlight selected character
 
       heroes.classList.add("has-selection");
@@ -593,8 +616,11 @@
 
       await wait(1200);
 
-      heroes.style.display = "none";
-
+      // Keep the character grid in the layout
+      // to avoid a sudden vertical repositioning
+      
+      heroes.style.visibility = "hidden";
+      
       message.classList.add("revelation");
 
 
@@ -675,7 +701,7 @@
       });
     
       heroes.classList.remove("has-selection");
-      heroes.style.display = "grid";
+      heroes.style.visibility = "visible";
     
       // Fade characters back in
     
