@@ -1,0 +1,3 @@
+// FRAGMENT 06 / 07 — REVELATION
+  const verdict = "YOU HAVE SUCCESSFULLY RECONSTRUCTED A DISTRACTION.";
+  log(`[RESULT] ${verdict}`);
