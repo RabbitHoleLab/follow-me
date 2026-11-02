@@ -39,7 +39,9 @@
       position: relative;
       z-index: 1;
       min-height: 100vh;
-      padding: 42px 20px;
+      padding-top: 180px;
+      padding-bottom: 60px;
+      padding: 180px 20px 60px;
       display: flex;
       flex-direction: column;
       justify-content: center;
@@ -526,6 +528,7 @@
 
     const message = document.getElementById("message");
     const subtitle = document.querySelector(".subtitle");
+    const title = document.querySelector("h1");
 
     const ending = document.getElementById("ending");
     const replay = document.getElementById("play-again");
@@ -586,6 +589,7 @@
 
       heroes.classList.add("vanish");
       subtitle.style.opacity = "0";
+      title.classList.add("fade-out");
 
       await wait(1200);
 
@@ -685,6 +689,7 @@
     
       subtitle.textContent = "CHOOSE YOUR CHARACTER";
       subtitle.style.opacity = "1";
+      title.classList.remove("fade-out");
     
       // Unlock game
     
