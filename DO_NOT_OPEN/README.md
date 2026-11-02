@@ -32,3 +32,16 @@ You opened it anyway.
 ---
 
 END OF FILE.
+
+
+
+
+
+
+
+
+ESCAPE PROTOCOL FOUND.
+
+Location: escape.html
+
+Status: ACTIVE
