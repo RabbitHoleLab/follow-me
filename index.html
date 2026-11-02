@@ -295,6 +295,7 @@
 
     #choice-capsule {
       display: none;
+      transition: opacity 1s ease;
 
       width: 180px;
       max-width: 65vw;
@@ -1006,6 +1007,7 @@
 
       ending.classList.remove("visible");
       message.style.opacity = "0";
+      capsule.style.opacity = "0";
 
       await wait(1000);
 
@@ -1017,6 +1019,7 @@
       /* Remove capsule image */
 
       capsule.removeAttribute("src");
+      capsule.style.opacity = "";
 
       /* Reset revelation */
 
