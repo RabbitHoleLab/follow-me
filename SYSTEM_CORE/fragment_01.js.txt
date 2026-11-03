@@ -1,4 +1,0 @@
-// FRAGMENT 01 / 07 — ENTRY POINT
-(() => {
-  "use strict";
-  const recovered = [];
