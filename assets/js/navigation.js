@@ -7,7 +7,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (visited === "yes") {
       event.preventDefault();
-      window.location.href = "URL_NOTION";
+      window.location.href = "https://follow-me-project.notion.site/FOLLOW-ME-40d166c9793280fcaefde86877d599d5";
     } else {
       sessionStorage.setItem("about-visited", "yes");
     }
