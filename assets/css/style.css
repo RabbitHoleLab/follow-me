@@ -570,30 +570,30 @@ main.revelation-mode .forbidden-routes { display: none; }
   .forbidden-route { transition: none; animation: none; }
 }
 
-
 .site-footer {
-  margin: 90px auto 25px;
-  padding: 15px 20px;
+  margin: 90px auto 20px;
+  padding: 12px 20px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 9px;
+  gap: 5px;
   text-align: center;
   font-family: monospace;
-  font-size: 10px;
-  letter-spacing: 1px;
+  font-size: 9px;
+  letter-spacing: 0.5px;
   color: #607668;
 }
 
 .site-footer a {
+  font-size: 9px;
   color: #819c89;
   text-decoration: none;
   transition: color 0.3s ease;
 }
 
-.site-footer a:hover,
-.site-footer a:focus-visible {
+.site-footer a:hover {
   color: #c2f5d0;
   text-decoration: underline;
 }
+
 
