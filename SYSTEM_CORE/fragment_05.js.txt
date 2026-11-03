@@ -1,3 +1,0 @@
-// FRAGMENT 05 / 07 — FALSE HOPE
-  log("[SYSTEM] Seven fragments successfully recovered.");
-  log("[SYSTEM] Original instructions decrypted.");
