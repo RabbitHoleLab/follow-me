@@ -574,7 +574,7 @@ main.revelation-mode .forbidden-routes { display: none; }
 
 @media (max-width: 600px) {
   .forbidden-routes {
-    margin-top: 45px;
+    margin-top: 55px;
   }
 }
 
