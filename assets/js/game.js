@@ -30,6 +30,9 @@
       localStorage.getItem(progressKey) || 0
     );
 
+    // Restore previously unlocked routes on reload.
+    renderForbiddenRoutes(attemptCount);
+
     /* ==========================================
        WAIT HELPER
     ========================================== */
@@ -65,6 +68,7 @@
       if (playing) return;
 
       playing = true;
+      main.classList.add("is-playing");
 
       /* ==========================================
          MATRIX COLOR
@@ -128,6 +132,11 @@
           "IS THAT REALLY ENOUGH FOR YOU ?",
           5000
         );
+
+        // Journeys after the anomaly also count for route unlocks.
+        // This does not alter the original endless-loop revelation.
+        attemptCount++;
+        localStorage.setItem(progressKey, String(attemptCount));
 
         /* Show PLAY AGAIN */
 
@@ -332,6 +341,10 @@
       subtitle.style.opacity = "1";
 
       title.classList.remove("fade-out");
+
+      /* Restore routes after the character-selection screen returns */
+      renderForbiddenRoutes(attemptCount);
+      main.classList.remove("is-playing");
 
       /* Unlock game */
 
