@@ -570,6 +570,12 @@ main.revelation-mode .forbidden-routes { display: none; }
   .forbidden-route { transition: none; animation: none; }
 }
 
+@media (max-width: 600px) {
+  .forbidden-routes {
+    margin-top: 45px;
+  }
+}
+
 .site-footer {
   margin: 90px auto 20px;
   padding: 12px 20px;
