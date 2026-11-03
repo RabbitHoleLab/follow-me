@@ -16,7 +16,7 @@ const forbiddenRoutes = Object.freeze([
 function renderForbiddenRoutes(completedJourneys) {
   const container = document.getElementById("forbidden-routes");
   if (!container) return;
-  const count = Math.min(forbiddenRoutes.length, Math.max(1, completedJourneys + 1));
+  const count = Math.min(forbiddenRoutes.length, Math.max(0, completedJourneys));
   container.replaceChildren();
   for (const route of forbiddenRoutes.slice(0, count)) {
     const link = document.createElement("a");

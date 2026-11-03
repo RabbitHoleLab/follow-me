@@ -493,50 +493,71 @@
     }
 
 /* ==========================================
-   FORBIDDEN ROUTES — suspicious, but not dominant
-   One route initially; more after completed journeys.
+   FORBIDDEN ROUTES — subtle system anomalies
+   None before the first completed journey.
 ========================================== */
 .forbidden-routes {
-  width: min(650px, 100%);
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 9px;
-  margin: 0 auto;
-}
-.forbidden-route {
+  width: min(710px, 100%);
   display: flex;
+  flex-wrap: wrap;
   justify-content: center;
   align-items: center;
-  min-height: 43px;
-  padding: 10px 12px;
-  border: 1px solid #80523f;
-  border-radius: 5px;
-  background: rgba(26, 10, 10, .83);
-  color: #e8b19b;
-  text-decoration: none;
-  font: 700 11px/1.4 monospace;
-  letter-spacing: .8px;
-  transition: background .2s, box-shadow .2s, transform .2s;
+  gap: 11px 15px;
+  margin: 0 auto;
 }
+.forbidden-routes:empty { display: none; }
+.forbidden-route {
+  --route-color: #b78372;
+  position: relative;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 35px;
+  max-width: 100%;
+  padding: 9px 17px;
+  border: 1px solid color-mix(in srgb, var(--route-color), transparent 37%);
+  border-radius: 2px;
+  background: rgba(5, 13, 10, .87);
+  color: var(--route-color);
+  text-decoration: none;
+  text-transform: uppercase;
+  font: 600 11px/1.4 Consolas, "Courier New", monospace;
+  letter-spacing: 1.25px;
+  box-shadow: inset 0 0 12px rgba(0,0,0,.45);
+  transition: color .25s, border-color .25s, background .25s,
+              box-shadow .25s, transform .25s;
+  animation: forbidden-materialize .5s ease-out both;
+}
+.forbidden-route::before {
+  content: "[!]";
+  margin-right: 9px;
+  opacity: .68;
+  font-size: 10px;
+}
+.forbidden-route:nth-child(3n + 2) { --route-color: #c4aa6a; }
+.forbidden-route:nth-child(3n) { --route-color: #a69bc5; }
+.forbidden-route:nth-child(4n) { --route-color: #8daea3; }
+.forbidden-route:nth-child(2n) { transform: translateY(3px); }
+.forbidden-route:nth-child(3n) { transform: translateY(-2px); }
 .forbidden-route:hover,
 .forbidden-route:focus-visible {
-  background: rgba(83, 21, 19, .95);
-  color: #ffe3d1;
-  box-shadow: 0 0 15px rgba(231, 81, 65, .25);
-  transform: translateY(-2px);
+  color: #f0ffe9;
+  border-color: var(--route-color);
+  background: rgba(26, 42, 32, .97);
+  box-shadow: 0 0 18px color-mix(in srgb, var(--route-color), transparent 70%);
+  transform: translateY(-4px);
   outline-offset: 3px;
 }
-.forbidden-route:nth-child(3n + 2) { border-color: #9a783b; color: #e6cc9b; }
-.forbidden-route:nth-child(3n) { border-color: #665a91; color: #c7b9ef; }
+@keyframes forbidden-materialize {
+  from { opacity: 0; filter: blur(4px); }
+  to { opacity: 1; filter: blur(0); }
+}
 main.is-playing .forbidden-routes,
 main.revelation-mode .forbidden-routes { display: none; }
 @media (max-width: 700px) {
-  .forbidden-routes { width: 85%; max-width: 390px; gap: 7px; }
-  .forbidden-route { min-height: 42px; padding: 8px 6px; font-size: 10px; letter-spacing: .2px; }
-}
-@media (max-width: 350px) {
-  .forbidden-routes { grid-template-columns: 1fr; }
+  .forbidden-routes { width: 92%; max-width: 420px; gap: 9px; }
+  .forbidden-route { min-height: 39px; padding: 9px 11px; font-size: 10px; letter-spacing: .5px; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .forbidden-route { transition: none; }
+  .forbidden-route { transition: none; animation: none; }
 }
