@@ -513,7 +513,7 @@ h1.fade-out {
   justify-content: center;
   align-items: center;
   gap: 11px 15px;
-  margin: 0 auto;
+  margin: 30 px 0 auto;
 }
 .forbidden-routes:empty { display: none; }
 .forbidden-route {
