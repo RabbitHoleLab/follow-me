@@ -124,8 +124,15 @@
           ? "assets/images/capsule-blue.png"
           : "assets/images/capsule-red.png";
 
-        main.classList.add("endless-loop");
-
+       capsule.style.opacity = "0";
+       main.classList.add("endless-loop");
+       
+       requestAnimationFrame(() => {
+         requestAnimationFrame(() => {
+           capsule.style.opacity = "1";
+         });
+       });
+             
         /* Only one message remains */
 
         await reveal(
