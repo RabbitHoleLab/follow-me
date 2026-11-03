@@ -596,4 +596,23 @@ main.revelation-mode .forbidden-routes { display: none; }
   text-decoration: underline;
 }
 
+.site-footer {
+  color: #8ca895;
+  font-size: 10px;
+  text-shadow: 0 1px 3px #000;
+}
+
+.site-footer a {
+  color: #b5d5bd;
+  font-size: 10px;
+  text-decoration: none;
+  text-shadow: 0 1px 3px #000;
+}
+
+.site-footer a:hover,
+.site-footer a:focus-visible {
+  color: #d6ffe1;
+  text-decoration: underline;
+}
+
 
