@@ -1,0 +1,126 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LOST & FOUND — Rabbit Hole Lab</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: #06120e;
+      color: #d5f6df;
+      font-family: Georgia, serif;
+      text-align: center;
+    }
+    .map {
+      position: relative;
+      width: min(100%, 1200px);
+      margin: 0 auto;
+    }
+    .map img {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+    .room {
+      position: absolute;
+      width: 7%;
+      height: 8%;
+      transform: translate(-50%, -50%);
+      border: 1px solid transparent;
+      border-radius: 8px;
+      background: transparent;
+      cursor: pointer;
+    }
+    .room:hover, .room:focus-visible {
+      border-color: #9affc2;
+      background: #9affc233;
+      outline: none;
+    }
+    dialog {
+      width: min(90vw, 430px);
+      padding: 28px;
+      border: 1px solid #69d89b;
+      border-radius: 12px;
+      background: #081b14;
+      color: #e2f8e9;
+      box-shadow: 0 0 45px #20c76b55;
+    }
+    dialog::backdrop {
+      background: #000b;
+    }
+    button.close {
+      margin-top: 20px;
+      padding: 10px 22px;
+      background: #173c29;
+      color: white;
+      border: 1px solid #69d89b;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <main class="map" id="map">
+    <img src="map.png" alt="Lost and Found research complex map">
+  </main>
+
+  <dialog id="archive">
+    <h2 id="room-title"></h2>
+    <p id="room-text"></p>
+    <button class="close" id="close">CLOSE</button>
+  </dialog>
+
+  <script>
+    const rooms = [
+      [1,24,17], [2,36,17], [3,49,17],
+      [4,61,17], [5,74,17], [6,87,17],
+      [7,86,36], [8,68,36], [9,66,57],
+      [10,85,57], [11,35,73], [12,54,73],
+      [13,18,64], [14,17,48], [15,31,37],
+      [16,89,73], [17,76,74]
+    ];
+
+    const content = {
+      6: "ACCESS DENIED. This sector is sealed.",
+      8: "ARCHIVE FRAGMENT (8): The process by which sensory information is selected, organized and interpreted.",
+      11: "This room appears to have been redecorated. No explanation has been provided."
+    };
+
+    const map = document.getElementById("map");
+    const dialog = document.getElementById("archive");
+
+    rooms.forEach(([number, x, y]) => {
+      const button = document.createElement("button");
+      button.className = "room";
+      button.style.left = x + "%";
+      button.style.top = y + "%";
+      button.setAttribute("aria-label", "Room " + number);
+      button.title = "Room " + number;
+
+      button.addEventListener("click", () => {
+        document.getElementById("room-title").textContent =
+          "ROOM " + String(number).padStart(2, "0");
+
+        document.getElementById("room-text").textContent =
+          content[number] ||
+          "UNDER CONSTRUCTION. This archive is not yet available.";
+
+        dialog.showModal();
+      });
+
+      map.appendChild(button);
+    });
+
+    document.getElementById("close").onclick = () => dialog.close();
+
+    dialog.addEventListener("click", event => {
+      if (event.target === dialog) dialog.close();
+    });
+  </script>
+
+</body>
+</html>
