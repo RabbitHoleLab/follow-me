@@ -149,6 +149,11 @@
       letter-spacing: 1px;
     }
 
+       /* Espacement des boutons interdits */
+       .forbidden-routes {
+         margin-top: 30px;
+       }
+
     /* ==========================================
        SUBTITLE AND MESSAGES
     ========================================== */
