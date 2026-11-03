@@ -1,3 +1,0 @@
-// FRAGMENT 02 / 07 — DIAGNOSTIC
-  const log = (message) => recovered.push(message);
-  log("[CORE] Restoring original exit protocol...");
