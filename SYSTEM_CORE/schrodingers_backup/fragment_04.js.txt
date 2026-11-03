@@ -1,0 +1,3 @@
+// FRAGMENT 04 / 07 — RECOVERY
+  const exitStatus = "NOT FOUND";
+  log(`[EXIT] ${exitStatus}. Searching deeper...`);
