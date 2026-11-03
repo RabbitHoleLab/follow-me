@@ -587,40 +587,28 @@ main.revelation-mode .forbidden-routes { display: none; }
   gap: 5px;
   text-align: center;
   font-family: monospace;
-  font-size: 9px;
+  font-size: 10px;
   letter-spacing: 0.5px;
-  color: #607668;
+  color: #5f8068;          /* lisible si on cherche, invisible si on ne cherche pas */
+  text-shadow: 0 1px 3px #000;
+  opacity: 0.7;
+  transition: opacity 0.6s ease;
+}
+
+.site-footer:hover,
+.site-footer:focus-within {
+  opacity: 1;              /* le footer "se réveille" quand on le survole */
 }
 
 .site-footer a {
-  font-size: 9px;
-  color: #819c89;
+  color: #8fb09a;
   text-decoration: none;
-  transition: color 0.3s ease;
-}
-
-.site-footer a:hover {
-  color: #c2f5d0;
-  text-decoration: underline;
-}
-
-.site-footer {
-  color: #8ca895;
-  font-size: 10px;
-  text-shadow: 0 1px 3px #000;
-}
-
-.site-footer a {
-  color: #b5d5bd;
-  font-size: 10px;
-  text-decoration: none;
-  text-shadow: 0 1px 3px #000;
+  transition: color 0.4s ease, text-shadow 0.4s ease;
 }
 
 .site-footer a:hover,
 .site-footer a:focus-visible {
-  color: #d6ffe1;
+  color: #00ff66;
+  text-shadow: 0 0 8px rgba(0, 255, 102, 0.7);
   text-decoration: underline;
 }
-
-
