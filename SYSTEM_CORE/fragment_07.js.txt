@@ -1,4 +1,0 @@
-// FRAGMENT 07 / 07 — FINAL OUTPUT
-  log("[HINT] NOT EVERYTHING WORTH FINDING IS HIDDEN IN THE SOURCE.");
-  console.log(recovered.join("\n"));
-})();
