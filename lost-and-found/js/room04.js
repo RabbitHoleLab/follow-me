@@ -46,12 +46,13 @@ window.roomInteractions[4] = {
     status.setAttribute("aria-live", "polite");
     status.style.cssText = `
       border-top: 1px solid #31583f;
-      margin-top: 14px;
-      padding-top: 12px;
+      margin-top: 10px;
+      padding: 10px 4px;
       color: #8dd2a5;
       white-space: pre-line;
-      line-height: 1.6;
-      min-height: 42px;
+      line-height: 1.5;
+      height: 90px;
+      overflow-y: auto;
     `;
 
     const actions = document.createElement("div");
