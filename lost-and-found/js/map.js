@@ -264,13 +264,20 @@ dialog.addEventListener("close", () => {
 });
 
 // ==================================================
-// 9. BACK NAVIGATION
+// 9. EXIT NAVIGATION
 // ==================================================
 
-backButton.addEventListener("click", () => {
-  if (window.history.length > 1) {
-    window.history.back();
-  } else {
+const isEmbedded = window.self !== window.top;
+
+if (isEmbedded) {
+  // Hide navigation inside embedded environments.
+  backButton.hidden = true;
+  backButton.style.display = "none";
+} else {
+  // Navigation available in standalone mode.
+  backButton.textContent = "← NOWHERE";
+
+  backButton.addEventListener("click", () => {
     window.location.href = "../";
-  }
-});
+  });
+}
