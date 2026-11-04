@@ -139,7 +139,7 @@ button.close {
   }
 
   .map-viewport {
-    height: calc(100dvh - 112px);
+    height: calc(100dvh - 65px);
     overflow: auto;
   }
 
