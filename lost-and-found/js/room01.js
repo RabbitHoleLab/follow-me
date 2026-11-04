@@ -1,13 +1,13 @@
-
 "use strict";
 
 /*
  * RABBITHOLELAB — LOST & FOUND
  * ROOM 01 — OBSERVATION ROOM
- * Terminal effects edition
+ * Terminal effects edition — v2 (effets plus visibles)
+ * Les modifications par rapport à ta version sont marquées ★
  */
 
-window.roomInteractions ??= {};
+window.roomInteractions = window.roomInteractions || {};   // ★ compatible anciens navigateurs
 
 window.roomInteractions[1] = {
   mount(container) {
@@ -19,6 +19,31 @@ window.roomInteractions[1] = {
     const reducedMotion = window.matchMedia(
       "(prefers-reduced-motion: reduce)"
     ).matches;
+
+    // ★ STYLES — animations et survol (inclus dans le terminal, supprimés avec lui)
+    const fx = document.createElement("style");
+    fx.textContent = `
+      @keyframes r1-pulse { 0%,100% { opacity: 1; } 50% { opacity: .35; } }
+      @keyframes r1-noise { to { background-position: 0 -37px, 29px 0; } }
+      @keyframes r1-glitch {
+        0%   { transform: translateX(-5px); filter: brightness(1.7);
+               text-shadow: 3px 0 rgba(255,70,100,.85), -3px 0 rgba(70,215,255,.85); }
+        20%  { transform: translateX(6px) skewX(-8deg); filter: brightness(.6); }
+        40%  { transform: translateX(-3px); filter: brightness(1.5);
+               text-shadow: -4px 0 rgba(255,70,100,.85), 4px 0 rgba(70,215,255,.85); }
+        60%  { transform: translateX(4px) skewX(5deg); filter: brightness(.8); }
+        80%  { transform: translateX(-2px); filter: brightness(1.3); }
+        100% { transform: none; filter: none; text-shadow: none; }
+      }
+      .r1-pulse  { animation: r1-pulse 1.6s ease-in-out infinite; }
+      .r1-glitch { animation: r1-glitch .42s steps(2, end); }
+      .r1-btn { transition: background .15s, box-shadow .15s; }
+      .r1-btn:hover { background: #21553a !important; box-shadow: 0 0 14px rgba(105,216,155,.5); }
+      .r1-btn:active { transform: translateY(1px); }
+      @media (prefers-reduced-motion: reduce) {
+        .r1-pulse, .r1-glitch { animation: none !important; }
+      }
+    `;
 
     // --------------------------------------------
     // TERMINAL
@@ -70,6 +95,25 @@ window.roomInteractions[1] = {
       );
     `;
 
+    // ★ Couche de "neige" vidéo au-dessus de l'écran (frère de screen : textContent ne l'efface pas)
+    const noise = document.createElement("div");
+
+    noise.style.cssText = `
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0;
+      mix-blend-mode: screen;
+      transition: opacity 0.12s;
+      background-image:
+        repeating-linear-gradient(to bottom, rgba(255,255,255,.16) 0 1px, transparent 1px 3px),
+        repeating-linear-gradient(to right, rgba(120,255,170,.12) 0 2px, transparent 2px 7px);
+    `;
+
+    const screenWrap = document.createElement("div");
+    screenWrap.style.position = "relative";
+    screenWrap.append(screen, noise);
+
     const actions = document.createElement("div");
 
     actions.style.cssText = `
@@ -79,8 +123,31 @@ window.roomInteractions[1] = {
       padding: 18px 8px 4px;
     `;
 
-    terminal.append(indicator, screen, actions);
+    terminal.append(fx, indicator, screenWrap, actions);
     container.appendChild(terminal);
+
+    // ★ Voyant : pulse tant que le système est "en ligne" (●), fixe quand il est coupé (○)
+    function setIndicator(text) {
+      indicator.textContent = text;
+      indicator.classList.toggle("r1-pulse", text.startsWith("●"));
+    }
+
+    // --------------------------------------------
+    // EFFETS ★
+    // --------------------------------------------
+
+    function showNoise(on) {
+      if (reducedMotion) return;
+      noise.style.opacity = on ? "0.9" : "0";
+      noise.style.animation = on ? "r1-noise 0.25s steps(3) infinite" : "none";
+    }
+
+    function glitchBurst() {
+      if (reducedMotion) return;
+      screen.classList.remove("r1-glitch");
+      void screen.offsetWidth;                 // relance l'animation
+      screen.classList.add("r1-glitch");
+    }
 
     // --------------------------------------------
     // TIMERS
@@ -93,6 +160,9 @@ window.roomInteractions[1] = {
       typingTimer = null;
       effectTimer = null;
 
+      screen.classList.remove("r1-glitch");    // ★
+      showNoise(false);                        // ★
+      screen.style.color = "";                 // ★
       screen.style.transform = "";
       screen.style.opacity = "1";
     }
@@ -112,23 +182,32 @@ window.roomInteractions[1] = {
         return;
       }
 
+      // ★ lecteurs d'écran : attendre la fin de la frappe avant d'annoncer le texte
+      screen.setAttribute("aria-busy", "true");
+
       let index = 0;
 
-      typingTimer = setInterval(() => {
+      const id = setInterval(() => {           // ★ identifiant local (plus de risque d'arrêter un autre minuteur)
         if (!active || currentSequence !== sequence) {
-          clearInterval(typingTimer);
+          clearInterval(id);
           return;
         }
 
         index = Math.min(index + 2, message.length);
-        screen.textContent = message.slice(0, index);
+        const finished = index >= message.length;
 
-        if (index >= message.length) {
-          clearInterval(typingTimer);
+        // ★ curseur ▌ pendant la frappe
+        screen.textContent = message.slice(0, index) + (finished ? "" : "▌");
+
+        if (finished) {
+          clearInterval(id);
           typingTimer = null;
+          screen.setAttribute("aria-busy", "false");
           done();
         }
       }, 24);
+
+      typingTimer = id;
     }
 
     // --------------------------------------------
@@ -144,6 +223,7 @@ window.roomInteractions[1] = {
         const button = document.createElement("button");
 
         button.type = "button";
+        button.className = "r1-btn";           // ★
         button.textContent = label;
 
         button.style.cssText = `
@@ -166,6 +246,11 @@ window.roomInteractions[1] = {
 
         actions.appendChild(button);
       });
+
+      // ★ clavier : le focus ne se perd plus quand les boutons sont remplacés
+      if (actions.firstElementChild) {
+        actions.firstElementChild.focus({ preventScroll: true });
+      }
     }
 
     // --------------------------------------------
@@ -185,19 +270,23 @@ window.roomInteractions[1] = {
       }
 
       if (effect === "glitch" && !reducedMotion) {
-        screen.style.opacity = "0.55";
-        screen.style.transform = "translateX(2px)";
+        // ★ rafale de glitch sur l'ancien texte, puis frappe, puis nouvelle secousse
+        glitchBurst();
+        showNoise(true);
 
         effectTimer = setTimeout(() => {
           if (!active) return;
 
-          screen.style.opacity = "1";
-          screen.style.transform = "";
+          showNoise(false);
 
           typeMessage(message, () => {
-            showButtons(choices);
+            glitchBurst();
+
+            effectTimer = setTimeout(() => {
+              if (active) showButtons(choices);
+            }, 450);
           });
-        }, 180);
+        }, 420);
 
         return;
       }
@@ -223,8 +312,24 @@ window.roomInteractions[1] = {
       let frame = 0;
       const currentSequence = sequence;
 
-      screen.style.color = "#8fd8a6";
-      screen.textContent = frames[frame];
+      // ★ chaque image a son ambiance (couleur, neige, secousse)
+      function applyFrame(i) {
+        screen.textContent = frames[i];
+
+        if (i === 2) {                         // signal perdu : rouge, neige, secousse
+          screen.style.color = "#ff8a8a";
+          showNoise(true);
+          glitchBurst();
+        } else if (i === 3) {                  // reconnexion : neige résiduelle
+          screen.style.color = "#8fd8a6";
+          showNoise(true);
+        } else {
+          screen.style.color = i === 4 ? "#6fa585" : "#8fd8a6";
+          showNoise(false);
+        }
+      }
+
+      applyFrame(0);
 
       const interval = setInterval(() => {
         if (!active || currentSequence !== sequence) {
@@ -237,6 +342,7 @@ window.roomInteractions[1] = {
         if (frame >= frames.length) {
           clearInterval(interval);
           screen.style.color = "";
+          showNoise(false);
 
           typeMessage(message, () => {
             showButtons(choices);
@@ -245,8 +351,8 @@ window.roomInteractions[1] = {
           return;
         }
 
-        screen.textContent = frames[frame];
-      }, 220);
+        applyFrame(frame);
+      }, 260);
 
       typingTimer = interval;
     }
@@ -256,8 +362,7 @@ window.roomInteractions[1] = {
     // --------------------------------------------
 
     function start() {
-      indicator.textContent =
-        "● OBSERVATION SYSTEM ONLINE";
+      setIndicator("● OBSERVATION SYSTEM ONLINE");
 
       display(
         "NO ACTIVE PERSONNEL DETECTED.\n" +
@@ -270,8 +375,7 @@ window.roomInteractions[1] = {
     }
 
     function camera() {
-      indicator.textContent =
-        "● CAMERA CONNECTION UNSTABLE";
+      setIndicator("● CAMERA CONNECTION UNSTABLE");
 
       display(
         "CAMERA FEED UNAVAILABLE.\n" +
@@ -285,8 +389,7 @@ window.roomInteractions[1] = {
     }
 
     function identify() {
-      indicator.textContent =
-        "● ANOMALY DETECTED";
+      setIndicator("● ANOMALY DETECTED");
 
       display(
         "SUBJECT: YOU.\n" +
@@ -312,8 +415,7 @@ window.roomInteractions[1] = {
     }
 
     function stopWatching() {
-      indicator.textContent =
-        "○ OBSERVATION DISABLED";
+      setIndicator("○ OBSERVATION DISABLED");
 
       display(
         "OBSERVATION DISABLED.\n" +
