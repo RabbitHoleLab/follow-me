@@ -4,22 +4,50 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+
   <title>LOST & FOUND — Rabbit Hole Lab</title>
+
   <link rel="stylesheet" href="CSS/style.css">
-  <script src="js/map.js" defer></script>
+
   <script src="js/rooms.js" defer></script>
   <script src="js/map.js" defer></script>
 </head>
+
 <body>
 
-  <main class="map" id="map">
-    <img src="map.png" alt="Lost and Found research complex map">
-  </main>
+  <header class="toolbar">
+    <span>LOST & FOUND — LEVEL 0</span>
+
+    <button id="back" type="button">
+      ← BACK
+    </button>
+  </header>
+
+  <div class="map-viewport" id="map-viewport">
+    <main class="map" id="map">
+      <img
+        src="map.png"
+        alt="Lost and Found research complex map"
+        draggable="false"
+      >
+    </main>
+  </div>
+
+  <footer class="toolbar bottom-toolbar">
+    <span>17 ROOMS</span>
+
+    <button id="reset-view" type="button">
+      RESET VIEW
+    </button>
+  </footer>
 
   <dialog id="archive">
     <h2 id="room-title"></h2>
     <p id="room-text"></p>
-    <button class="close" id="close">CLOSE</button>
+
+    <button class="close" id="close" type="button">
+      CLOSE
+    </button>
   </dialog>
 
 </body>
