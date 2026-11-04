@@ -22,33 +22,29 @@ window.roomInteractions[2] = {
 
     terminal.style.cssText = `
       background: #08120e;
-      margin-bottom: 20px;
+      margin-bottom: 4px;
       border: 1px solid #365344;
       border-radius: 7px;
-      padding: 18px 12px;
-      font-family: monospace;
-      color: #d4eadb;
-      text-align: left;
-      overflow-wrap: anywhere;
-    `;
-
-    const header = document.createElement("div");
-    header.style.cssText = `
-      color: #80b995;
-      font-size: 11px;
-      letter-spacing: 1px;
-      margin-bottom: 15px;
-      text-align: center;
-    `;
+      padding: 10px 8px;
+    
+        const header = document.createElement("div");
+        header.style.cssText = `
+          color: #80b995;
+          font-size: 11px;
+          letter-spacing: 1px;
+          margin-bottom: 7px;
+          text-align: center;
+        `;
+        
     header.textContent = "ARCHIVE TERMINAL // INTERNAL USE ONLY";
 
     const screen = document.createElement("div");
     screen.style.cssText = `
-      min-height: 175px;
+      min-height: 0;
       white-space: pre-line;
-      line-height: 1.8;
-      font-size: 12px;
-      padding: 16px 8px;
+      line-height: 1.45;
+      font-size: 11px;
+      padding: 8px 4px;
       border-top: 1px solid #365344;
       border-bottom: 1px solid #365344;
     `;
@@ -59,8 +55,8 @@ window.roomInteractions[2] = {
     actions.style.cssText = `
       display: flex;
       flex-direction: column;
-      gap: 9px;
-      margin-top: 16px;
+      gap: 5px;
+      margin-top: 8px;
     `;
 
     terminal.append(header, screen, actions);
@@ -85,8 +81,8 @@ window.roomInteractions[2] = {
           button.textContent = label;
 
           button.style.cssText = `
-            min-height: 44px;
-            padding: 11px;
+            min-height: 40px;
+            padding: 7px;
             color: #d4eadb;
             background: #173629;
             border: 1px solid #547c60;
