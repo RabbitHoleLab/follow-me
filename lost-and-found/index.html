@@ -122,7 +122,7 @@
     const map = document.getElementById("map");
     const dialog = document.getElementById("archive");
 
-    rooms.forEach(([number, x, y]) => {
+    rooms.forEach(([number, x, y, width, height]) => {
       const button = document.createElement("button");
       button.className = "room";
       button.style.left = x + "%";
