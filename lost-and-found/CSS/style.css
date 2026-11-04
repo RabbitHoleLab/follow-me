@@ -153,7 +153,23 @@ dialog {
   }
 
   button.close {
-    min-height: 44px;
-    font-size: 15px;
+    display: block;
+    margin: 12px auto 0;
+    padding: 10px 22px;
+  
+    background-color: #173c29 !important;
+    color: #e2f8e9 !important;
+  
+    border: 1px solid #69d89b;
+    border-radius: 6px;
+  
+    font-family: monospace;
+    font-size: 13px;
+    cursor: pointer;
+  }
+  
+  button.close:hover {
+    background-color: #285c3c !important;
+    border-color: #9affc2;
   }
 }
