@@ -42,7 +42,7 @@
           "ROOM " + String(number).padStart(2, "0");
 
         document.getElementById("room-text").textContent =
-          content[number] ||
+          window.roomContent[number] ||
           "UNDER CONSTRUCTION. This archive is not yet available.";
 
         dialog.showModal();
