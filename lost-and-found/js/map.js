@@ -23,14 +23,7 @@
       [16, 77.13, 77.45, 9, 14],
       [17, 65.07, 79.92, 12, 14]
     ];
-
-
-    const content = {
-      6: "ACCESS DENIED. This sector is sealed.",
-      8: "ARCHIVE FRAGMENT (8): The process by which sensory information is selected, organized and interpreted.",
-      11: "This room appears to have been redecorated. No explanation has been provided."
-    };
-
+ 
     const map = document.getElementById("map");
     const dialog = document.getElementById("archive");
 
