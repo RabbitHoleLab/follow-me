@@ -22,6 +22,7 @@ window.roomInteractions[2] = {
 
     terminal.style.cssText = `
       background: #08120e;
+      margin-bottom: 20px;
       border: 1px solid #365344;
       border-radius: 7px;
       padding: 18px 12px;
