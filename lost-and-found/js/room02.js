@@ -26,16 +26,22 @@ window.roomInteractions[2] = {
       border: 1px solid #365344;
       border-radius: 7px;
       padding: 10px 8px;
+      font-family: monospace;
+      color: #d4eadb;
+      text-align: left;
+      overflow-wrap: anywhere;
+    `;
     
-        const header = document.createElement("div");
-        header.style.cssText = `
-          color: #80b995;
-          font-size: 11px;
-          letter-spacing: 1px;
-          margin-bottom: 7px;
-          text-align: center;
-        `;
-        
+    const header = document.createElement("div");
+    
+    header.style.cssText = `
+      color: #80b995;
+      font-size: 11px;
+      letter-spacing: 1px;
+      margin-bottom: 7px;
+      text-align: center;
+    `;
+    
     header.textContent = "ARCHIVE TERMINAL // INTERNAL USE ONLY";
 
     const screen = document.createElement("div");
