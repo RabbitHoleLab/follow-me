@@ -80,7 +80,77 @@
   </dialog>
 
   
-<script>
+
+
+  <script>
+    
+    
+    const rooms = [
+      // [number, centerX%, centerY%, width%, height%]
+    
+      [1, 16.5, 22.5, 9.0, 17.0],
+      [2, 29.5, 22.5, 13.0, 18.0],
+      [3, 42.5, 22.5, 10.0, 18.0],
+      [4, 53.5, 22.5, 10.0, 18.0],
+      [5, 63.0, 22.5, 9.0, 17.0],
+      [6, 78.5, 24.0, 12.0, 17.0],
+    
+      [7, 78.0, 41.0, 10.0, 13.0],
+      [8, 60.0, 41.5, 17.0, 14.0],
+    
+      [9, 57.0, 59.0, 12.0, 12.0],
+      [10, 73.5, 61.0, 13.0, 13.0],
+    
+      [11, 31.5, 78.0, 12.0, 19.0],
+      [12, 47.5, 80.0, 15.0, 21.0],
+      [13, 16.0, 70.0, 14.0, 16.0],
+      [14, 15.0, 53.0, 12.0, 12.0],
+      [15, 27.0, 41.0, 12.0, 13.0],
+    
+      [16, 81.0, 78.0, 10.0, 16.0],
+      [17, 67.5, 78.0, 12.0, 16.0]
+    ];
+
+
+
+    const content = {
+      6: "ACCESS DENIED. This sector is sealed.",
+      8: "ARCHIVE FRAGMENT (8): The process by which sensory information is selected, organized and interpreted.",
+      11: "This room appears to have been redecorated. No explanation has been provided."
+    };
+
+    const map = document.getElementById("map");
+    const dialog = document.getElementById("archive");
+
+    rooms.forEach(([number, x, y]) => {
+      const button = document.createElement("button");
+      button.className = "room";
+      button.style.left = x + "%";
+      button.style.top = y + "%";
+      button.setAttribute("aria-label", "Room " + number);
+      button.title = "Room " + number;
+
+      button.addEventListener("click", () => {
+        document.getElementById("room-title").textContent =
+          "ROOM " + String(number).padStart(2, "0");
+
+        document.getElementById("room-text").textContent =
+          content[number] ||
+          "UNDER CONSTRUCTION. This archive is not yet available.";
+
+        dialog.showModal();
+      });
+
+      map.appendChild(button);
+    });
+
+    document.getElementById("close").onclick = () => dialog.close();
+
+    dialog.addEventListener("click", event => {
+      if (event.target === dialog) dialog.close();
+    });
+  </script>
+  <script>
 (() => {
   const params = new URLSearchParams(location.search);
   if (params.get("calibrate") !== "1") return;
@@ -194,75 +264,6 @@
 })();
 </script>
 
-
-  <script>
-    
-    
-    const rooms = [
-      // [number, centerX%, centerY%, width%, height%]
-    
-      [1, 16.5, 22.5, 9.0, 17.0],
-      [2, 29.5, 22.5, 13.0, 18.0],
-      [3, 42.5, 22.5, 10.0, 18.0],
-      [4, 53.5, 22.5, 10.0, 18.0],
-      [5, 63.0, 22.5, 9.0, 17.0],
-      [6, 78.5, 24.0, 12.0, 17.0],
-    
-      [7, 78.0, 41.0, 10.0, 13.0],
-      [8, 60.0, 41.5, 17.0, 14.0],
-    
-      [9, 57.0, 59.0, 12.0, 12.0],
-      [10, 73.5, 61.0, 13.0, 13.0],
-    
-      [11, 31.5, 78.0, 12.0, 19.0],
-      [12, 47.5, 80.0, 15.0, 21.0],
-      [13, 16.0, 70.0, 14.0, 16.0],
-      [14, 15.0, 53.0, 12.0, 12.0],
-      [15, 27.0, 41.0, 12.0, 13.0],
-    
-      [16, 81.0, 78.0, 10.0, 16.0],
-      [17, 67.5, 78.0, 12.0, 16.0]
-    ];
-
-
-
-    const content = {
-      6: "ACCESS DENIED. This sector is sealed.",
-      8: "ARCHIVE FRAGMENT (8): The process by which sensory information is selected, organized and interpreted.",
-      11: "This room appears to have been redecorated. No explanation has been provided."
-    };
-
-    const map = document.getElementById("map");
-    const dialog = document.getElementById("archive");
-
-    rooms.forEach(([number, x, y]) => {
-      const button = document.createElement("button");
-      button.className = "room";
-      button.style.left = x + "%";
-      button.style.top = y + "%";
-      button.setAttribute("aria-label", "Room " + number);
-      button.title = "Room " + number;
-
-      button.addEventListener("click", () => {
-        document.getElementById("room-title").textContent =
-          "ROOM " + String(number).padStart(2, "0");
-
-        document.getElementById("room-text").textContent =
-          content[number] ||
-          "UNDER CONSTRUCTION. This archive is not yet available.";
-
-        dialog.showModal();
-      });
-
-      map.appendChild(button);
-    });
-
-    document.getElementById("close").onclick = () => dialog.close();
-
-    dialog.addEventListener("click", event => {
-      if (event.target === dialog) dialog.close();
-    });
-  </script>
 
 </body>
 </html>
