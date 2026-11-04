@@ -79,6 +79,122 @@
     <button class="close" id="close">CLOSE</button>
   </dialog>
 
+  
+<script>
+(() => {
+  const params = new URLSearchParams(location.search);
+  if (params.get("calibrate") !== "1") return;
+
+  const map = document.querySelector(".map");
+  const image = map?.querySelector("img");
+  const buttons = [...document.querySelectorAll(".room")];
+  if (!map || !image || !buttons.length) return;
+
+  let selected = 1;
+
+  const panel = document.createElement("div");
+  panel.style.cssText = `
+    position:fixed;top:12px;right:12px;z-index:9999;
+    background:#081b14;color:#eaffee;padding:15px;
+    border:1px solid #7cffaa;border-radius:10px;
+    font:14px Arial;max-width:290px;
+    box-shadow:0 0 20px #0009;
+  `;
+
+  panel.innerHTML = `
+    <strong>MAP CALIBRATION</strong>
+    <p>Select a room, then click its center on the map.</p>
+    <select id="cal-room"></select>
+    <p id="cal-status"></p>
+    <button id="cal-copy">COPY COORDINATES</button>
+    <button id="cal-exit">EXIT</button>
+  `;
+  document.body.appendChild(panel);
+
+  const select = panel.querySelector("#cal-room");
+  const status = panel.querySelector("#cal-status");
+
+  const positions = buttons.map((button, i) => ({
+    number: i + 1,
+    x: parseFloat(button.style.left),
+    y: parseFloat(button.style.top),
+    width: parseFloat(button.style.width),
+    height: parseFloat(button.style.height)
+  }));
+
+  positions.forEach(room => {
+    const option = document.createElement("option");
+    option.value = room.number;
+    option.textContent = "ROOM " + String(room.number).padStart(2, "0");
+    select.appendChild(option);
+  });
+
+  select.onchange = () => {
+    selected = Number(select.value);
+    updateStatus();
+  };
+
+  function updateStatus() {
+    const room = positions[selected - 1];
+    status.textContent =
+      `ROOM ${selected}: X ${room.x.toFixed(2)}% / Y ${room.y.toFixed(2)}%`;
+  }
+
+  buttons.forEach(button => {
+    button.style.background = "rgba(0,255,120,.15)";
+    button.style.border = "2px dashed #00ff88";
+    button.style.pointerEvents = "none";
+  });
+
+  image.style.cursor = "crosshair";
+
+  map.addEventListener("click", event => {
+    const rect = image.getBoundingClientRect();
+
+    const x = (event.clientX - rect.left) / rect.width * 100;
+    const y = (event.clientY - rect.top) / rect.height * 100;
+
+    if (x < 0 || x > 100 || y < 0 || y > 100) return;
+
+    const room = positions[selected - 1];
+    room.x = Number(x.toFixed(2));
+    room.y = Number(y.toFixed(2));
+
+    const button = buttons[selected - 1];
+    button.style.left = room.x + "%";
+    button.style.top = room.y + "%";
+
+    updateStatus();
+  });
+
+  panel.querySelector("#cal-copy").onclick = async () => {
+    const code = "const rooms = [\n" +
+      positions.map(r =>
+        `  [${r.number}, ${r.x}, ${r.y}, ${r.width}, ${r.height}]`
+      ).join(",\n") +
+      "\n];";
+
+    try {
+      await navigator.clipboard.writeText(code);
+      status.textContent = "Coordinates copied!";
+    } catch {
+      const area = document.createElement("textarea");
+      area.value = code;
+      panel.appendChild(area);
+      area.select();
+      status.textContent = "Copy the selected text.";
+    }
+  };
+
+  panel.querySelector("#cal-exit").onclick = () => {
+    location.href = location.pathname;
+  };
+
+  updateStatus();
+})();
+</script>
+
+
   <script>
     
     
