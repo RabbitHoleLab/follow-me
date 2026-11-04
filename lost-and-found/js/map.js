@@ -56,3 +56,25 @@
     dialog.addEventListener("click", event => {
       if (event.target === dialog) dialog.close();
     });//map
+
+
+    const viewport = document.getElementById("map-viewport");
+    
+    // Return to the previous page, when possible.
+    document.getElementById("back").addEventListener("click", () => {
+      if (window.history.length > 1) {
+        window.history.back();
+      } else {
+        window.location.href = "../";
+      }
+    });
+    
+    // Reset map position.
+    document.getElementById("reset-view").addEventListener("click", () => {
+      viewport.scrollTo({
+        left: 0,
+        top: 0,
+        behavior: "smooth"
+      });
+    });
+
