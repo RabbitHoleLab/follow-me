@@ -69,12 +69,5 @@
       }
     });
     
-    // Reset map position.
-    document.getElementById("reset-view").addEventListener("click", () => {
-      viewport.scrollTo({
-        left: 0,
-        top: 0,
-        behavior: "smooth"
-      });
-    });
+    
 
