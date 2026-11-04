@@ -45,7 +45,7 @@ const rooms = [
 
 // Add a room number when its interactive script exists.
 // Example: new Set([1, 2, 3])
-const interactiveRooms = new Set([1, 2, 3]);
+const interactiveRooms = new Set([1, 2, 3, 4]);
 
 const map = document.getElementById("map");
 const dialog = document.getElementById("archive");
