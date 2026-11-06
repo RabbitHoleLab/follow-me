@@ -159,22 +159,29 @@ window.roomInteractions[10] = {
           </svg>
         </button>
 
-        <div class="r10-paper" aria-hidden="true">
-        <div style="text-align:center;">
-          <div style="font-size:34px;">♠</div>
-          <div style="
-            margin-top:8px;
-            font: bold 15px monospace;
-            letter-spacing:2px;
-          ">
-            lesar
+       <div class="r10-paper" aria-hidden="true">
+          <div style="text-align:center;">
+            <div style="font-size:34px;line-height:1.2;">
+              ♠
+            </div>
+            <div style="
+              margin-top:10px;
+              font-size:15px;
+              font-family:monospace;
+              font-weight:bold;
+              letter-spacing:2px;
+              color:#333126;
+            ">
+              LESAR
+            </div>
           </div>
         </div>
-      </div>
-
-      <div class="r10-footnote">
-        ARCHIVE STATUS: EMPTY
-      </div>
+        
+        </div><!-- fermeture de .r10-wall -->
+        
+        <div class="r10-footnote">
+          ARCHIVE STATUS: EMPTY
+        </div>
     `;
 
     container.appendChild(room);
