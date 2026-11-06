@@ -173,7 +173,12 @@ async function openRoom(number) {
   roomTitle.textContent =
     "ROOM " + String(number).padStart(2, "0");
 
+  // ROOM 05 — the waiting room has no visible CLOSE button.
+  closeButton.hidden = number === 5;
+  closeButton.style.display = number === 5 ? "none" : "";
+  
   roomText.textContent = "";
+ 
 
   // Interactive room
   if (interactiveRooms.has(number)) {
@@ -240,7 +245,9 @@ rooms.forEach(([number, x, y, width, height]) => {
 function closeRoom() {
   // Invalidate any pending script load.
   ++clickToken;
-
+  closeButton.hidden = false;
+  closeButton.style.display = "";
+  
   if (dialog.open) {
     dialog.close();
   }
