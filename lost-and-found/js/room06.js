@@ -38,7 +38,7 @@ window.roomInteractions[6] = {
     room.innerHTML = `
       <style>
         .r6-panel {
-          padding: 20px 14px;
+          padding: 14px 12px;
           border: 1px solid #3d4934;
           border-radius: 8px;
           background:
@@ -56,12 +56,12 @@ window.roomInteractions[6] = {
           color: #8b9d8a;
           font-size: 10px;
           letter-spacing: 2px;
-          margin-bottom: 26px;
+          margin-bottom: 16px;
         }
 
         .r6-icon {
           font-size: 45px;
-          margin-bottom: 12px;
+          margin-bottom: 6px;
           filter: drop-shadow(0 0 10px #d5a34b44);
         }
 
@@ -70,14 +70,14 @@ window.roomInteractions[6] = {
           font-size: clamp(17px, 5vw, 25px);
           font-weight: bold;
           letter-spacing: 1px;
-          margin-bottom: 15px;
+          margin-bottom: 10px;
         }
 
         .r6-description {
           font-size: 12px;
           line-height: 1.8;
           color: #a1b5a2;
-          margin-bottom: 28px;
+          margin-bottom: 18px;
         }
 
         .r6-progress-label {
@@ -118,9 +118,9 @@ window.roomInteractions[6] = {
         }
 
         .r6-status {
-          min-height: 60px;
-          margin-top: 24px;
-          padding: 14px 8px;
+          min-height: 52px;
+          margin-top: 16px;
+          padding: 12px 8px;
           border-top: 1px solid #354335;
           color: #a9c2ab;
           font-size: 11px;
@@ -146,20 +146,8 @@ window.roomInteractions[6] = {
           color: #e2b35b;
         }
 
-        .r6-secret {
-          margin-top: 23px;
-          padding: 15px 10px;
-          border: 1px dashed #80683e;
-          border-radius: 5px;
-          background: #191b11;
-          color: #e2b35b;
-          font-size: 11px;
-          line-height: 1.9;
-          white-space: pre-line;
-        }
-
         .r6-footer {
-          margin-top: 23px;
+          margin-top: 14px;
           color: #536453;
           font-size: 9px;
           letter-spacing: 1px;
@@ -210,14 +198,6 @@ window.roomInteractions[6] = {
           CHECK FOR UPDATES
         </button>
 
-        <div class="r6-secret" hidden>
-          MAINTENANCE REPORT // CLASSIFIED
-
-          NO CONSTRUCTION ACTIVITY DETECTED.
-
-          THE ROOM WAS NEVER BROKEN.
-        </div>
-
         <div class="r6-footer">
           SYSTEM INTEGRITY: QUESTIONABLE
         </div>
@@ -231,7 +211,6 @@ window.roomInteractions[6] = {
     const track = room.querySelector(".r6-progress-track");
     const status = room.querySelector(".r6-status");
     const inspect = room.querySelector(".r6-inspect");
-    const secret = room.querySelector(".r6-secret");
 
     function setProgress(value) {
       progress = value;
@@ -283,7 +262,7 @@ window.roomInteractions[6] = {
     }
 
     function checkUpdates() {
-      if (!active) return;
+      if (!active || revealed) return;
 
       inspectionCount++;
 
@@ -297,14 +276,12 @@ window.roomInteractions[6] = {
       status.textContent =
         messages[(inspectionCount - 1) % messages.length];
 
-      if (inspectionCount >= 4 && !revealed) {
+      if (inspectionCount >= 4) {
         revealed = true;
 
-        secret.hidden = false;
-
         status.textContent =
-          "UNAUTHORIZED INSPECTION DETECTED.\n" +
-          "MAINTENANCE RECORD EXPOSED.";
+          "UNAUTHORIZED INSPECTION DETECTED.\n\n" +
+          "NO CONSTRUCTION ACTIVITY DETECTED.";
 
         inspect.textContent = "NO FURTHER UPDATES";
         inspect.disabled = true;
