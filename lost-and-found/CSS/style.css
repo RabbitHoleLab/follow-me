@@ -181,6 +181,7 @@ dialog {
 #archive #close {
   display: inline-block;
   padding: 10px 24px;
+  margin-top: 18px;
 
   background: #071b13;
   color: #a8e6bf;
