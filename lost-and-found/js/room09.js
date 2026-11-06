@@ -3,14 +3,14 @@
 
 /*
  * RABBITHOLELAB — LOST & FOUND
- * ROOM 13 — THE PERSONALITY TEST
+ * ROOM 9 — THE PERSONALITY TEST
  *
  * The test is the patient.
  */
 
 window.roomInteractions ??= {};
 
-window.roomInteractions[13] = {
+window.roomInteractions[9] = {
   mount(container) {
     let active = true;
     let questionIndex = 0;
@@ -89,7 +89,7 @@ window.roomInteractions[13] = {
 
     room.innerHTML = `
       <style>
-        .r13-panel {
+        .r9-panel {
           padding: 17px 13px;
           border: 1px solid #31533d;
           border-radius: 8px;
@@ -99,37 +99,37 @@ window.roomInteractions[13] = {
           text-align: center;
         }
 
-        .r13-header {
+        .r9-header {
           color: #77aa89;
           font-size: 10px;
           letter-spacing: 1.5px;
           margin-bottom: 18px;
         }
 
-        .r13-progress {
+        .r9-progress {
           color: #5c8c6e;
           font-size: 10px;
           margin-bottom: 14px;
         }
 
-        .r13-question {
+        .r9-question {
           min-height: 58px;
           display: flex;
           align-items: center;
           justify-content: center;
           color: #d8f4df;
-          font-size: 13px;
+          font-size: px;
           line-height: 1.6;
           margin-bottom: 16px;
         }
 
-        .r13-options {
+        .r9-options {
           display: flex;
           flex-direction: column;
           gap: 9px;
         }
 
-        .r13-option {
+        .r9-option {
           padding: 11px 9px;
           min-height: 42px;
           border: 1px solid #49765a;
@@ -141,13 +141,13 @@ window.roomInteractions[13] = {
           transition: background 0.2s;
         }
 
-        .r13-option:hover,
-        .r13-option:focus-visible {
+        .r9-option:hover,
+        .r9-option:focus-visible {
           background: #26553a;
           border-color: #8dddab;
         }
 
-        .r13-analysis {
+        .r9-analysis {
           min-height: 56px;
           margin-top: 16px;
           padding: 12px 8px;
@@ -158,19 +158,19 @@ window.roomInteractions[13] = {
           white-space: pre-line;
         }
 
-        .r13-final {
+        .r9-final {
           padding: 8px 0;
           line-height: 1.8;
         }
 
-        .r13-diagnosis {
+        .r9-diagnosis {
           color: #f0a0a0;
           font-size: 14px;
           font-weight: bold;
           margin: 18px 0;
         }
 
-        .r13-restart {
+        .r9-restart {
           margin-top: 14px;
           padding: 11px 16px;
           border: 1px solid #79d39a;
@@ -181,7 +181,7 @@ window.roomInteractions[13] = {
           cursor: pointer;
         }
 
-        .r13-footer {
+        .r9-footer {
           margin-top: 17px;
           color: #4d7259;
           font-size: 9px;
@@ -189,20 +189,20 @@ window.roomInteractions[13] = {
         }
       </style>
 
-      <div class="r13-panel">
-        <div class="r13-header">
+      <div class="r9-panel">
+        <div class="r9-header">
           RABBITHOLELAB // PSYCHOLOGICAL ASSESSMENT
         </div>
 
-        <div class="r13-progress"></div>
-        <div class="r13-question"></div>
-        <div class="r13-options"></div>
+        <div class="r9-progress"></div>
+        <div class="r9-question"></div>
+        <div class="r9-options"></div>
 
-        <div class="r13-analysis" role="status" aria-live="polite">
+        <div class="r9-analysis" role="status" aria-live="polite">
           AWAITING RESPONSE...
         </div>
 
-        <div class="r13-footer">
+        <div class="r9-footer">
           ALL RESULTS ARE SCIENTIFICALLY QUESTIONABLE.
         </div>
       </div>
@@ -210,10 +210,10 @@ window.roomInteractions[13] = {
 
     container.appendChild(room);
 
-    const progress = room.querySelector(".r13-progress");
-    const question = room.querySelector(".r13-question");
-    const options = room.querySelector(".r13-options");
-    const analysis = room.querySelector(".r13-analysis");
+    const progress = room.querySelector(".r9-progress");
+    const question = room.querySelector(".r9-question");
+    const options = room.querySelector(".r9-options");
+    const analysis = room.querySelector(".r9-analysis");
 
     function clearTimer() {
       if (timer !== null) {
@@ -240,7 +240,7 @@ window.roomInteractions[13] = {
         const button = document.createElement("button");
 
         button.type = "button";
-        button.className = "r13-option";
+        button.className = "r9-option";
         button.textContent = answer;
 
         button.addEventListener("click", () => {
@@ -290,12 +290,12 @@ window.roomInteractions[13] = {
       options.replaceChildren();
 
       analysis.innerHTML = `
-        <div class="r13-final">
+        <div class="r9-final">
           SUBJECT ANALYSIS: INCONCLUSIVE.<br>
           PERSONALITY PROFILE: UNAVAILABLE.<br>
           CONFIDENCE LEVEL: UNJUSTIFIABLY HIGH.
 
-          <div class="r13-diagnosis">
+          <div class="r9-diagnosis">
             DIAGNOSIS: THE TEST REQUIRES THERAPY.
           </div>
 
@@ -306,7 +306,7 @@ window.roomInteractions[13] = {
 
       const restart = document.createElement("button");
       restart.type = "button";
-      restart.className = "r13-restart";
+      restart.className = "r9-restart";
       restart.textContent = "REQUEST A SECOND OPINION";
 
       restart.addEventListener("click", () => {
