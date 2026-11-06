@@ -173,3 +173,37 @@ dialog {
     border-color: #9affc2;
   }
 }
+
+/* ==========================================
+   LOST & FOUND — CLOSE BUTTON
+========================================== */
+
+#archive #close {
+  display: inline-block;
+  padding: 10px 24px;
+
+  background: #071b13;
+  color: #a8e6bf;
+
+  border: 1px solid #4b9970;
+  border-radius: 5px;
+
+  font-family: Consolas, monospace;
+  font-size: 12px;
+  font-weight: bold;
+  letter-spacing: 1.5px;
+
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+#archive #close:hover {
+  background: #17432e;
+  color: #ffffff;
+  box-shadow: 0 0 14px rgba(75, 200, 120, 0.3);
+}
+
+#archive #close:focus-visible {
+  outline: 2px solid #a8e6bf;
+  outline-offset: 3px;
+}
