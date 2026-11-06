@@ -196,7 +196,7 @@ window.roomInteractions[5] = {
         buildActions();
       });
 
-      actions.appendChild(restart);
+      actions.append(restart, exit);
     }
 
     function buildActions() {
