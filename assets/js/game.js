@@ -120,9 +120,11 @@
 
         /* Choose the capsule image */
 
-        capsule.src = isBlue
-          ? "assets/images/capsule-blue.png"
-          : "assets/images/capsule-red.png";
+        
+       capsule.src = isBlue
+         ? "assets/images/capsule-blue.webp"
+         : "assets/images/capsule-red.webp";
+
 
        capsule.style.opacity = "0";
        main.classList.add("endless-loop");
