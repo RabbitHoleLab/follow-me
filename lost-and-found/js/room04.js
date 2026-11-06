@@ -51,8 +51,9 @@ window.roomInteractions[4] = {
       color: #8dd2a5;
       white-space: pre-line;
       line-height: 1.5;
-      height: 90px;
-      overflow-y: auto;
+      min-height: 90px;
+      height: auto;
+      overflow: visible;
     `;
 
     const actions = document.createElement("div");
