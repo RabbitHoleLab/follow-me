@@ -154,6 +154,30 @@ window.roomInteractions[5] = {
         cursor:pointer;
       `;
 
+      const exit = document.createElement("button");
+        exit.type = "button";
+        exit.textContent = "LEAVE THE WAITING ROOM";
+        
+      exit.style.cssText = `
+        width: 100%;
+        min-height: 44px;
+        padding: 10px;
+        margin-top: 10px;
+        color: #d5f6df;
+        background: #173c29;
+        border: 1px solid #69d89b;
+        border-radius: 6px;
+        font: 12px monospace;
+        cursor: pointer;
+      `;
+
+      exit.addEventListener("click", () => {
+        const dialog = document.getElementById("archive");
+        if (dialog?.open) {
+          dialog.close();
+        }
+      });
+
       restart.addEventListener("click", () => {
         if (!active) return;
 
