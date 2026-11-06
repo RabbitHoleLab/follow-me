@@ -160,7 +160,15 @@ window.roomInteractions[10] = {
         </button>
 
         <div class="r10-paper" aria-hidden="true">
-          ♠
+        <div style="text-align:center;">
+          <div style="font-size:34px;">♠</div>
+          <div style="
+            margin-top:8px;
+            font: bold 15px monospace;
+            letter-spacing:2px;
+          ">
+            lesar
+          </div>
         </div>
       </div>
 
