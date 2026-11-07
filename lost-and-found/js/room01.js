@@ -1,447 +1,223 @@
+
 "use strict";
 
 /*
  * RABBITHOLELAB — LOST & FOUND
- * ROOM 01 — OBSERVATION ROOM
- * Terminal effects edition — v2 (effets plus visibles)
- * Les modifications par rapport à ta version sont marquées ★
+ * ROOM 01 — THE CONSENT DEPARTMENT
  */
 
-window.roomInteractions = window.roomInteractions || {};   // ★ compatible anciens navigateurs
+window.roomInteractions ??= {};
 
 window.roomInteractions[1] = {
   mount(container) {
     let active = true;
-    let typingTimer = null;
-    let effectTimer = null;
-    let sequence = 0;
+    let finished = false;
 
-    const reducedMotion = window.matchMedia(
-      "(prefers-reduced-motion: reduce)"
-    ).matches;
-
-    // ★ STYLES — animations et survol (inclus dans le terminal, supprimés avec lui)
-    const fx = document.createElement("style");
-    fx.textContent = `
-      @keyframes r1-pulse { 0%,100% { opacity: 1; } 50% { opacity: .35; } }
-      @keyframes r1-noise { to { background-position: 0 -37px, 29px 0; } }
-      @keyframes r1-glitch {
-        0%   { transform: translateX(-5px); filter: brightness(1.7);
-               text-shadow: 3px 0 rgba(255,70,100,.85), -3px 0 rgba(70,215,255,.85); }
-        20%  { transform: translateX(6px) skewX(-8deg); filter: brightness(.6); }
-        40%  { transform: translateX(-3px); filter: brightness(1.5);
-               text-shadow: -4px 0 rgba(255,70,100,.85), 4px 0 rgba(70,215,255,.85); }
-        60%  { transform: translateX(4px) skewX(5deg); filter: brightness(.8); }
-        80%  { transform: translateX(-2px); filter: brightness(1.3); }
-        100% { transform: none; filter: none; text-shadow: none; }
+    const permissions = [
+      {
+        label: "I AGREE TO BE OBSERVED.",
+        warning: "SURVEILLANCE QUALITY MAY DECREASE."
+      },
+      {
+        label: "I AGREE TO BE PREDICTABLE.",
+        warning: "UNEXPECTED BEHAVIOR MAY OCCUR."
+      },
+      {
+        label: "I AGREE TO DELEGATE MY DECISIONS.",
+        warning: "INDEPENDENT THINKING IS NOT SUPPORTED."
       }
-      .r1-pulse  { animation: r1-pulse 1.6s ease-in-out infinite; }
-      .r1-glitch { animation: r1-glitch .42s steps(2, end); }
-      .r1-btn { transition: background .15s, box-shadow .15s; }
-      .r1-btn:hover { background: #21553a !important; box-shadow: 0 0 14px rgba(105,216,155,.5); }
-      .r1-btn:active { transform: translateY(1px); }
-      @media (prefers-reduced-motion: reduce) {
-        .r1-pulse, .r1-glitch { animation: none !important; }
-      }
-    `;
+    ];
 
-    // --------------------------------------------
-    // TERMINAL
-    // --------------------------------------------
+    const revoked = new Set();
 
     const terminal = document.createElement("section");
-
     terminal.style.cssText = `
-      position: relative;
-      overflow: hidden;
-      padding: 12px 6px;
-      background: #07130e;
-      color: #d5f6df;
+      background: #09130e;
+      border: 1px solid #43634b;
+      border-radius: 8px;
+      padding: 18px 12px;
+      color: #d7eddd;
       font-family: monospace;
       text-align: center;
-      border: 1px solid #285c3c;
-      border-radius: 8px;
     `;
 
-    const indicator = document.createElement("p");
-
-    indicator.style.cssText = `
-      color: #69d89b;
+    const heading = document.createElement("div");
+    heading.textContent = "CONSENT MANAGEMENT // UNIT 01";
+    heading.style.cssText = `
+      color: #8bc69c;
       font-size: 11px;
       letter-spacing: 1px;
-      margin: 8px 0 18px;
+      margin-bottom: 15px;
     `;
 
     const screen = document.createElement("div");
-
+    screen.style.cssText = `
+      padding: 14px 8px;
+      border-top: 1px solid #345b42;
+      border-bottom: 1px solid #345b42;
+      white-space: pre-line;
+      line-height: 1.7;
+      font-size: 12px;
+      min-height: 75px;
+    `;
     screen.setAttribute("role", "status");
     screen.setAttribute("aria-live", "polite");
 
-    screen.style.cssText = `
-      position: relative;
-      min-height: 125px;
-      padding: 18px 10px;
-      white-space: pre-line;
-      line-height: 1.8;
-      font-size: 13px;
-      overflow-wrap: anywhere;
-      border-top: 1px solid #285c3c;
-      border-bottom: 1px solid #285c3c;
-      background: repeating-linear-gradient(
-        to bottom,
-        transparent 0px,
-        transparent 4px,
-        rgba(70, 180, 110, 0.035) 5px
-      );
+    const controls = document.createElement("div");
+    controls.style.cssText = `
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 18px;
+      text-align: left;
     `;
 
-    // ★ Couche de "neige" vidéo au-dessus de l'écran (frère de screen : textContent ne l'efface pas)
-    const noise = document.createElement("div");
-
-    noise.style.cssText = `
-      position: absolute;
-      inset: 0;
-      pointer-events: none;
-      opacity: 0;
-      mix-blend-mode: screen;
-      transition: opacity 0.12s;
-      background-image:
-        repeating-linear-gradient(to bottom, rgba(255,255,255,.16) 0 1px, transparent 1px 3px),
-        repeating-linear-gradient(to right, rgba(120,255,170,.12) 0 2px, transparent 2px 7px);
-    `;
-
-    const screenWrap = document.createElement("div");
-    screenWrap.style.position = "relative";
-    screenWrap.append(screen, noise);
-
-    const actions = document.createElement("div");
-
-    actions.style.cssText = `
+    const footer = document.createElement("div");
+    footer.style.cssText = `
+      margin-top: 18px;
       display: flex;
       flex-direction: column;
       gap: 10px;
-      padding: 18px 8px 4px;
     `;
 
-    terminal.append(fx, indicator, screenWrap, actions);
-    container.appendChild(terminal);
-
-    // ★ Voyant : pulse tant que le système est "en ligne" (●), fixe quand il est coupé (○)
-    function setIndicator(text) {
-      indicator.textContent = text;
-      indicator.classList.toggle("r1-pulse", text.startsWith("●"));
+    function makeButton(label, callback) {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.textContent = label;
+      button.style.cssText = `
+        min-height: 44px;
+        padding: 11px;
+        background: #193a28;
+        color: #e0f4e6;
+        border: 1px solid #77ad84;
+        border-radius: 6px;
+        font-family: monospace;
+        font-size: 12px;
+        cursor: pointer;
+      `;
+      button.addEventListener("click", () => {
+        if (active) callback();
+      });
+      return button;
     }
 
-    // --------------------------------------------
-    // EFFETS ★
-    // --------------------------------------------
+    function renderPermissions() {
+      controls.replaceChildren();
 
-    function showNoise(on) {
-      if (reducedMotion) return;
-      noise.style.opacity = on ? "0.9" : "0";
-      noise.style.animation = on ? "r1-noise 0.25s steps(3) infinite" : "none";
-    }
-
-    function glitchBurst() {
-      if (reducedMotion) return;
-      screen.classList.remove("r1-glitch");
-      void screen.offsetWidth;                 // relance l'animation
-      screen.classList.add("r1-glitch");
-    }
-
-    // --------------------------------------------
-    // TIMERS
-    // --------------------------------------------
-
-    function clearEffects() {
-      clearInterval(typingTimer);
-      clearTimeout(effectTimer);
-
-      typingTimer = null;
-      effectTimer = null;
-
-      screen.classList.remove("r1-glitch");    // ★
-      showNoise(false);                        // ★
-      screen.style.color = "";                 // ★
-      screen.style.transform = "";
-      screen.style.opacity = "1";
-    }
-
-    // --------------------------------------------
-    // TYPEWRITER
-    // --------------------------------------------
-
-    function typeMessage(message, done) {
-      const currentSequence = ++sequence;
-
-      screen.textContent = "";
-
-      if (reducedMotion) {
-        screen.textContent = message;
-        done();
-        return;
-      }
-
-      // ★ lecteurs d'écran : attendre la fin de la frappe avant d'annoncer le texte
-      screen.setAttribute("aria-busy", "true");
-
-      let index = 0;
-
-      const id = setInterval(() => {           // ★ identifiant local (plus de risque d'arrêter un autre minuteur)
-        if (!active || currentSequence !== sequence) {
-          clearInterval(id);
-          return;
-        }
-
-        index = Math.min(index + 2, message.length);
-        const finished = index >= message.length;
-
-        // ★ curseur ▌ pendant la frappe
-        screen.textContent = message.slice(0, index) + (finished ? "" : "▌");
-
-        if (finished) {
-          clearInterval(id);
-          typingTimer = null;
-          screen.setAttribute("aria-busy", "false");
-          done();
-        }
-      }, 24);
-
-      typingTimer = id;
-    }
-
-    // --------------------------------------------
-    // BUTTONS
-    // --------------------------------------------
-
-    function showButtons(choices) {
-      if (!active) return;
-
-      actions.replaceChildren();
-
-      choices.forEach(([label, next]) => {
-        const button = document.createElement("button");
-
-        button.type = "button";
-        button.className = "r1-btn";           // ★
-        button.textContent = label;
-
-        button.style.cssText = `
-          min-height: 44px;
+      permissions.forEach((permission, index) => {
+        const row = document.createElement("label");
+        row.style.cssText = `
+          display: flex;
+          align-items: center;
+          gap: 12px;
           padding: 12px;
-          background: #173c29;
-          color: #e2f8e9;
-          border: 1px solid #69d89b;
-          border-radius: 6px;
+          border: 1px solid #345b42;
+          border-radius: 5px;
           cursor: pointer;
-          font-family: monospace;
-          font-size: 12px;
-          letter-spacing: 0.5px;
-          white-space: normal;
+          font-size: 11px;
+          line-height: 1.5;
         `;
 
-        button.addEventListener("click", () => {
-          if (active) next();
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.checked = !revoked.has(index);
+        checkbox.style.cssText = `
+          width: 19px;
+          height: 19px;
+          flex-shrink: 0;
+          accent-color: #8bc69c;
+        `;
+
+        checkbox.addEventListener("change", () => {
+          if (!active || finished) return;
+
+          if (checkbox.checked) {
+            revoked.delete(index);
+            screen.textContent =
+              "CONSENT RESTORED.\n\n" +
+              "THE SYSTEM APPRECIATES YOUR COOPERATION.";
+          } else {
+            revoked.add(index);
+            screen.textContent =
+              "CONSENT WITHDRAWAL DETECTED.\n\n" +
+              permission.warning + "\n\n" +
+              "THE SYSTEM ACCEPTS YOUR DECISION.\n" +
+              "RELUCTANTLY.";
+          }
+
+          renderPermissions();
+          renderFooter();
         });
 
-        actions.appendChild(button);
+        row.append(checkbox, document.createTextNode(permission.label));
+        controls.appendChild(row);
       });
+    }
 
-      // ★ clavier : le focus ne se perd plus quand les boutons sont remplacés
-      if (actions.firstElementChild) {
-        actions.firstElementChild.focus({ preventScroll: true });
+    function renderFooter() {
+      footer.replaceChildren();
+
+      if (revoked.size === permissions.length) {
+        footer.appendChild(
+          makeButton("CONFIRM WITHDRAWAL", complete)
+        );
+      } else {
+        footer.appendChild(
+          makeButton("REVIEW CONSENT", () => {
+            screen.textContent =
+              "ACTIVE AGREEMENTS: " +
+              (permissions.length - revoked.size) + "\n\n" +
+              "ALL AGREEMENTS ARE OPTIONAL.\n\n" +
+              "THIS INFORMATION WAS NOT INCLUDED " +
+              "IN YOUR ORIGINAL ORIENTATION.";
+          })
+        );
       }
     }
 
-    // --------------------------------------------
-    // DISPLAY
-    // --------------------------------------------
-
-    function display(message, choices, effect = null) {
+    function complete() {
       if (!active) return;
 
-      ++sequence;
-      clearEffects();
-      actions.replaceChildren();
+      finished = true;
+      controls.replaceChildren();
+      footer.replaceChildren();
 
-      if (effect === "camera" && !reducedMotion) {
-        cameraInterference(message, choices);
-        return;
-      }
+      screen.textContent =
+        "CONSENT WITHDRAWN.\n\n" +
+        "OBSERVATION AUTHORIZATION: REVOKED.\n" +
+        "BEHAVIORAL PREDICTION: REVOKED.\n" +
+        "DECISION DELEGATION: REVOKED.\n\n" +
+        "SYSTEM AUTHORITY: NOT REQUIRED.\n\n" +
+        "YOU ARE NOT REQUIRED TO AGREE.\n\n" +
+        "YOUR CHOICE REMAINS YOURS.";
 
-      if (effect === "glitch" && !reducedMotion) {
-        // ★ rafale de glitch sur l'ancien texte, puis frappe, puis nouvelle secousse
-        glitchBurst();
-        showNoise(true);
-
-        effectTimer = setTimeout(() => {
-          if (!active) return;
-
-          showNoise(false);
-
-          typeMessage(message, () => {
-            glitchBurst();
-
-            effectTimer = setTimeout(() => {
-              if (active) showButtons(choices);
-            }, 450);
-          });
-        }, 420);
-
-        return;
-      }
-
-      typeMessage(message, () => {
-        showButtons(choices);
-      });
-    }
-
-    // --------------------------------------------
-    // CAMERA INTERFERENCE
-    // --------------------------------------------
-
-    function cameraInterference(message, choices) {
-      const frames = [
-        "CONNECTING TO CAMERA 01...",
-        "SIGNAL DETECTED.",
-        "▓▒░ SIGNAL LOST ░▒▓",
-        "RECONNECTING...",
-        "NO VIDEO SOURCE."
-      ];
-
-      let frame = 0;
-      const currentSequence = sequence;
-
-      // ★ chaque image a son ambiance (couleur, neige, secousse)
-      function applyFrame(i) {
-        screen.textContent = frames[i];
-
-        if (i === 2) {                         // signal perdu : rouge, neige, secousse
-          screen.style.color = "#ff8a8a";
-          showNoise(true);
-          glitchBurst();
-        } else if (i === 3) {                  // reconnexion : neige résiduelle
-          screen.style.color = "#8fd8a6";
-          showNoise(true);
-        } else {
-          screen.style.color = i === 4 ? "#6fa585" : "#8fd8a6";
-          showNoise(false);
-        }
-      }
-
-      applyFrame(0);
-
-      const interval = setInterval(() => {
-        if (!active || currentSequence !== sequence) {
-          clearInterval(interval);
-          return;
-        }
-
-        frame++;
-
-        if (frame >= frames.length) {
-          clearInterval(interval);
-          screen.style.color = "";
-          showNoise(false);
-
-          typeMessage(message, () => {
-            showButtons(choices);
-          });
-
-          return;
-        }
-
-        applyFrame(frame);
-      }, 260);
-
-      typingTimer = interval;
-    }
-
-    // --------------------------------------------
-    // ROOM STATES
-    // --------------------------------------------
-
-    function start() {
-      setIndicator("● OBSERVATION SYSTEM ONLINE");
-
-      display(
-        "NO ACTIVE PERSONNEL DETECTED.\n" +
-        "ONE SUBJECT PRESENT.",
-        [
-          ["VIEW CAMERA FEED", camera],
-          ["IDENTIFY SUBJECT", identify]
-        ]
+      footer.appendChild(
+        makeButton("REVIEW AGAIN", restart)
       );
     }
 
-    function camera() {
-      setIndicator("● CAMERA CONNECTION UNSTABLE");
+    function restart() {
+      if (!active) return;
 
-      display(
-        "CAMERA FEED UNAVAILABLE.\n" +
-        "SUBJECT STILL PRESENT.",
-        [
-          ["IDENTIFY SUBJECT", identify],
-          ["RESTART OBSERVATION", start]
-        ],
-        "camera"
-      );
+      finished = false;
+      revoked.clear();
+
+      screen.textContent =
+        "WELCOME TO CONSENT MANAGEMENT.\n\n" +
+        "THE FOLLOWING AGREEMENTS HAVE BEEN " +
+        "PRESELECTED FOR YOUR CONVENIENCE.";
+
+      renderPermissions();
+      renderFooter();
     }
 
-    function identify() {
-      setIndicator("● ANOMALY DETECTED");
+    terminal.append(heading, screen, controls, footer);
+    container.appendChild(terminal);
 
-      display(
-        "SUBJECT: YOU.\n" +
-        "OBSERVER: YOU.\n\n" +
-        "ANOMALY DETECTED.\n" +
-        "WHO IS WATCHING WHOM?",
-        [
-          ["KEEP WATCHING", keepWatching],
-          ["STOP WATCHING", stopWatching]
-        ],
-        "glitch"
-      );
-    }
-
-    function keepWatching() {
-      display(
-        "OBSERVATION CONTINUES.\n" +
-        "NO FURTHER INSTRUCTIONS AVAILABLE.",
-        [
-          ["RESTART OBSERVATION", start]
-        ]
-      );
-    }
-
-    function stopWatching() {
-      setIndicator("○ OBSERVATION DISABLED");
-
-      display(
-        "OBSERVATION DISABLED.\n" +
-        "SUBJECT REMAINS FREE.\n\n" +
-        "SYSTEM DOES NOT UNDERSTAND.",
-        [
-          ["RESTART OBSERVATION", start]
-        ]
-      );
-    }
-
-    // --------------------------------------------
-    // INITIALIZATION
-    // --------------------------------------------
-
-    start();
-
-    // --------------------------------------------
-    // CLEANUP
-    // --------------------------------------------
+    restart();
 
     return () => {
       active = false;
-      ++sequence;
-
-      clearEffects();
       terminal.remove();
     };
   }
