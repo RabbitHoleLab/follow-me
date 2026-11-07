@@ -118,7 +118,7 @@ window.roomInteractions[9] = {
           align-items: center;
           justify-content: center;
           color: #d8f4df;
-          font-size: px;
+          font-size: 13px;
           line-height: 1.6;
           margin-bottom: 16px;
         }
