@@ -58,7 +58,7 @@ window.roomInteractions[1] = {
       white-space: pre-line;
       line-height: 1.7;
       font-size: 12px;
-      height: 210px;
+      height: 150px;
       box-sizing: border-box;
       overflow-y: auto;
     `;
