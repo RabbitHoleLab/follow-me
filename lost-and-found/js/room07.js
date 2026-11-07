@@ -2,14 +2,14 @@
 
 /*
  * RABBITHOLELAB — LOST & FOUND
- * ROOM 01 — OBSERVATION ROOM
+ * ROOM 07 — OBSERVATION ROOM
  * Terminal effects edition — v2 (effets plus visibles)
  * Les modifications par rapport à ta version sont marquées ★
  */
 
 window.roomInteractions = window.roomInteractions || {};   // ★ compatible anciens navigateurs
 
-window.roomInteractions[1] = {
+window.roomInteractions[7] = {
   mount(container) {
     let active = true;
     let typingTimer = null;
@@ -23,9 +23,9 @@ window.roomInteractions[1] = {
     // ★ STYLES — animations et survol (inclus dans le terminal, supprimés avec lui)
     const fx = document.createElement("style");
     fx.textContent = `
-      @keyframes r1-pulse { 0%,100% { opacity: 1; } 50% { opacity: .35; } }
-      @keyframes r1-noise { to { background-position: 0 -37px, 29px 0; } }
-      @keyframes r1-glitch {
+      @keyframes r7-pulse { 0%,100% { opacity: 1; } 50% { opacity: .35; } }
+      @keyframes r7-noise { to { background-position: 0 -37px, 29px 0; } }
+      @keyframes r7-glitch {
         0%   { transform: translateX(-5px); filter: brightness(1.7);
                text-shadow: 3px 0 rgba(255,70,100,.85), -3px 0 rgba(70,215,255,.85); }
         20%  { transform: translateX(6px) skewX(-8deg); filter: brightness(.6); }
@@ -35,13 +35,13 @@ window.roomInteractions[1] = {
         80%  { transform: translateX(-2px); filter: brightness(1.3); }
         100% { transform: none; filter: none; text-shadow: none; }
       }
-      .r1-pulse  { animation: r1-pulse 1.6s ease-in-out infinite; }
-      .r1-glitch { animation: r1-glitch .42s steps(2, end); }
-      .r1-btn { transition: background .15s, box-shadow .15s; }
-      .r1-btn:hover { background: #21553a !important; box-shadow: 0 0 14px rgba(105,216,155,.5); }
-      .r1-btn:active { transform: translateY(1px); }
+      .r7-pulse  { animation: r7-pulse 1.6s ease-in-out infinite; }
+      .r7-glitch { animation: r7-glitch .42s steps(2, end); }
+      .r7-btn { transition: background .15s, box-shadow .15s; }
+      .r7-btn:hover { background: #21553a !important; box-shadow: 0 0 14px rgba(105,216,155,.5); }
+      .r7-btn:active { transform: translateY(1px); }
       @media (prefers-reduced-motion: reduce) {
-        .r1-pulse, .r1-glitch { animation: none !important; }
+        .r7-pulse, .r7-glitch { animation: none !important; }
       }
     `;
 
@@ -129,7 +129,7 @@ window.roomInteractions[1] = {
     // ★ Voyant : pulse tant que le système est "en ligne" (●), fixe quand il est coupé (○)
     function setIndicator(text) {
       indicator.textContent = text;
-      indicator.classList.toggle("r1-pulse", text.startsWith("●"));
+      indicator.classList.toggle("r7-pulse", text.startsWith("●"));
     }
 
     // --------------------------------------------
@@ -139,14 +139,14 @@ window.roomInteractions[1] = {
     function showNoise(on) {
       if (reducedMotion) return;
       noise.style.opacity = on ? "0.9" : "0";
-      noise.style.animation = on ? "r1-noise 0.25s steps(3) infinite" : "none";
+      noise.style.animation = on ? "r7-noise 0.25s steps(3) infinite" : "none";
     }
 
     function glitchBurst() {
       if (reducedMotion) return;
-      screen.classList.remove("r1-glitch");
+      screen.classList.remove("r7-glitch");
       void screen.offsetWidth;                 // relance l'animation
-      screen.classList.add("r1-glitch");
+      screen.classList.add("r7-glitch");
     }
 
     // --------------------------------------------
@@ -160,7 +160,7 @@ window.roomInteractions[1] = {
       typingTimer = null;
       effectTimer = null;
 
-      screen.classList.remove("r1-glitch");    // ★
+      screen.classList.remove("r7-glitch");    // ★
       showNoise(false);                        // ★
       screen.style.color = "";                 // ★
       screen.style.transform = "";
@@ -223,7 +223,7 @@ window.roomInteractions[1] = {
         const button = document.createElement("button");
 
         button.type = "button";
-        button.className = "r1-btn";           // ★
+        button.className = "r7-btn";           // ★
         button.textContent = label;
 
         button.style.cssText = `
