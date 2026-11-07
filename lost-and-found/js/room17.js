@@ -7,7 +7,8 @@
  *
  * Installation :
  *   1. ce fichier dans js/room17.js
- *   2. dans map.js : const interactiveRooms = new Set([1, 17]);
+ *   2. dans map.js : AJOUTE 17 à la liste existante de interactiveRooms
+ *      (ne remplace pas la liste : garde les numéros déjà présents).
  *
  * Règles (cachées au joueur) :
  *   - si tu marches VERS la porte, elle recule d'un pas (la distance ne change pas) ;
@@ -92,7 +93,9 @@ window.roomInteractions[17] = {
       vanish:
         "THE DOOR HAS LEFT THE CORRIDOR.\n\n" +
         "IT IS NOW AT THE OTHER END.\n" +
-        "IT WAS NEVER AT THE END YOU WERE WALKING TO.",
+        "IT WAS NEVER AT THE END YOU WERE WALKING TO.\n\n" +
+        "THE DOOR IS NO LONGER RUNNING.\n" +
+        "YOU MAY APPROACH.",
       threshold:
         "THRESHOLD REACHED.\n\n" +
         "THE DOOR IS HERE.\n" +
@@ -172,9 +175,9 @@ window.roomInteractions[17] = {
                      box-shadow: 0 0 46px rgba(190,250,255,1) !important; animation: none !important; }
       .r17-glitch  { animation: r17-glitch .45s steps(2, end); }
       .r17-btn { transition: background .15s, box-shadow .15s; }
-      .r17-btn:hover:not(:disabled) { background: #21553a !important; box-shadow: 0 0 14px rgba(105,216,155,.5); }
-      .r17-btn:active:not(:disabled) { transform: translateY(1px); }
-      .r17-btn:disabled { opacity: .45; cursor: default !important; }
+      .r17-btn:hover:not(.r17-busy) { background: #21553a !important; box-shadow: 0 0 14px rgba(105,216,155,.5); }
+      .r17-btn:active:not(.r17-busy) { transform: translateY(1px); }
+      .r17-btn.r17-busy { opacity: .45; cursor: default !important; }
       @media (prefers-reduced-motion: reduce) {
         .r17-pulse, .r17-door, .r17-glitch { animation: none !important; }
         .r17-mover { transition: none !important; }
@@ -224,19 +227,29 @@ window.roomInteractions[17] = {
 
     corridor.append(floor, door, player);
 
-    const screen = el("div", `
-      min-height: 112px; margin-top: 12px; padding: 16px 10px; white-space: pre-line;
+    // Hauteur stable : toutes les phrases possibles sont superposées (invisibles) dans la même
+    // cellule de grille, qui prend donc la hauteur de la plus longue, quelle que soit la largeur.
+    const screenBox = el("div", `
+      display: grid; margin-top: 12px; padding: 16px 10px; white-space: pre-line;
       line-height: 1.8; font-size: 13px; overflow-wrap: anywhere;
       border-top: 1px solid #285c3c; border-bottom: 1px solid #285c3c;
     `);
+    const sizer = el("div", `grid-area: 1 / 1; display: grid; visibility: hidden; pointer-events: none;`);
+    sizer.setAttribute("aria-hidden", "true");
+    [TEXT.intro, TEXT.introBack, TEXT.again, ...TEXT.chase, ...TEXT.follow, ...TEXT.free, ...TEXT.wall,
+     TEXT.vanish, TEXT.threshold, ...TEXT.stay, TEXT.back, TEXT.open]
+      .forEach(t => sizer.appendChild(el("div", `grid-area: 1 / 1;`, t)));
+
+    const screen = el("div", `grid-area: 1 / 1;`);
     screen.setAttribute("role", "status");
     screen.setAttribute("aria-live", "polite");
+    screenBox.append(sizer, screen);
 
     const stats = el("p", `font-size: 11px; letter-spacing: 1px; color: #69d89b; margin: 10px 0 0; opacity: .85;`);
 
     const actions = el("div", `padding: 14px 8px 4px;`);
 
-    terminal.append(fx, indicator, corridor, screen, stats, actions);
+    terminal.append(fx, indicator, corridor, screenBox, stats, actions);
     container.appendChild(terminal);
 
     const BTN_CSS = `
@@ -295,8 +308,11 @@ window.roomInteractions[17] = {
     }
 
     function setBusy(on) {
-      busy = on;
-      moveButtons.forEach(b => { b.disabled = on; });
+      busy = on;                                  // pas de "disabled" : le focus clavier est conservé
+      moveButtons.forEach(b => {
+        b.classList.toggle("r17-busy", on);
+        b.setAttribute("aria-disabled", String(on));
+      });
     }
 
     function showChoices(list) {
