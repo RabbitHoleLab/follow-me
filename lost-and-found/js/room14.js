@@ -11,7 +11,8 @@
  *
  * Installation :
  *   1. ce fichier dans js/room14.js
- *   2. dans map.js : const interactiveRooms = new Set([1, 14, 17]);
+ *   2. dans map.js : AJOUTE 14 à la liste existante de interactiveRooms
+ *      (ne remplace pas la liste : garde les numéros déjà présents).
  *
  * Tous les textes sont dans TEXT, les réglages dans CONFIG.
  */
@@ -155,19 +156,29 @@ window.roomInteractions[14] = {
 
     const indicator = el("p", `color: #69d89b; font-size: 11px; letter-spacing: 1px; margin: 12px 0 12px;`);
 
-    const screen = el("div", `
-      min-height: 150px; max-height: 260px; overflow: auto; margin: 0 4px; padding: 18px 12px;
+    // Hauteur stable pendant tout l'inventaire : les phrases possibles sont superposées (invisibles)
+    // dans la même cellule de grille. La fin (plus longue) s'agrandit simplement, sans barre de défilement.
+    const screenBox = el("div", `
+      display: grid; margin: 0 4px; padding: 18px 12px;
       white-space: pre-line; line-height: 1.8; font-size: 13px; overflow-wrap: anywhere;
       border: 1px dashed #3f8a5d; border-radius: 6px; background: rgba(10, 30, 20, .55);
     `);
+    const sizer = el("div", `grid-area: 1 / 1; display: grid; visibility: hidden; pointer-events: none;`);
+    sizer.setAttribute("aria-hidden", "true");
+    [TEXT.intro, TEXT.label,
+     ...TEXT.items.flatMap((it, n) => ["ITEM 0" + (n + 1) + " / 07\n\n" + it.ask, it.keep, it.ret])]
+      .forEach(t => sizer.appendChild(el("div", `grid-area: 1 / 1;`, t)));
+
+    const screen = el("div", `grid-area: 1 / 1;`);
     screen.setAttribute("role", "status");
     screen.setAttribute("aria-live", "polite");
+    screenBox.append(sizer, screen);
 
     const stats = el("p", `font-size: 11px; letter-spacing: 1px; color: #69d89b; margin: 10px 0 0; opacity: .85;`);
 
     const actions = el("div", `padding: 14px 8px 4px;`);
 
-    terminal.append(fx, header, clockNote, indicator, screen, stats, actions);
+    terminal.append(fx, header, clockNote, indicator, screenBox, stats, actions);
     container.appendChild(terminal);
 
     const BTN_BASE = `
@@ -208,7 +219,6 @@ window.roomInteractions[14] = {
 
     function say(text) {
       screen.textContent = text;
-      screen.scrollTop = screen.scrollHeight;
       if (!reducedMotion) {
         screen.classList.remove("r14-fade");
         void screen.offsetWidth;
