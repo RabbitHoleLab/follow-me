@@ -3,7 +3,7 @@
 
 /*
  * RABBITHOLELAB — LOST & FOUND
- * ROOM 03 — THE COMPLIANCE TEST
+ * ROOM 03 — CONTROL PANEL
  */
 
 window.roomInteractions ??= {};
@@ -11,185 +11,192 @@ window.roomInteractions ??= {};
 window.roomInteractions[3] = {
   mount(container) {
     let active = true;
-    let timer = null;
-    let sequence = 0;
-    let firstChoice = "";
-
-    const reducedMotion = window.matchMedia(
-      "(prefers-reduced-motion: reduce)"
-    ).matches;
+    let attempts = 0;
+    let released = false;
 
     const terminal = document.createElement("section");
     terminal.style.cssText = `
-      background: #09130e;
-      border: 1px solid #43634b;
+      background: #08140f;
+      border: 1px solid #31583f;
       border-radius: 8px;
-      padding: 18px 12px;
-      color: #d7eddd;
+      padding: 14px 10px;
+      color: #d5f6df;
       font-family: monospace;
+      font-size: 12px;
       text-align: center;
-      overflow-wrap: anywhere;
     `;
 
     const header = document.createElement("div");
     header.style.cssText = `
-      color: #8bc69c;
+      color: #8dd2a5;
       font-size: 11px;
       letter-spacing: 1px;
-      margin-bottom: 16px;
+      margin-bottom: 12px;
     `;
 
-    const screen = document.createElement("div");
-    screen.style.cssText = `
-      min-height: 145px;
-      padding: 20px 8px;
-      border-top: 1px solid #345b42;
-      border-bottom: 1px solid #345b42;
-      white-space: pre-line;
-      line-height: 1.8;
-      font-size: 13px;
-    `;
-    screen.setAttribute("role", "status");
-    screen.setAttribute("aria-live", "polite");
-
-    const actions = document.createElement("div");
-    actions.style.cssText = `
+    const controls = document.createElement("div");
+    controls.style.cssText = `
       display: flex;
       flex-direction: column;
-      gap: 10px;
-      margin-top: 18px;
+      gap: 12px;
     `;
 
-    terminal.append(header, screen, actions);
+    const status = document.createElement("div");
+    status.setAttribute("role", "status");
+    status.setAttribute("aria-live", "polite");
+    status.style.cssText = `
+      border-top: 1px solid #31583f;
+      margin-top: 10px;
+      padding: 10px 4px;
+      color: #8dd2a5;
+      white-space: pre-line;
+      line-height: 1.5;
+      min-height: 90px;
+      height: auto;
+      overflow: visible;
+    `;
+
+    const actions = document.createElement("div");
+    actions.style.marginTop = "12px";
+
+    terminal.append(header, controls, status, actions);
     container.appendChild(terminal);
 
-    function display(title, message, choices) {
-      if (!active) return;
+    const values = {
+      REALITY: 50,
+      FREEDOM: 50,
+      TRUTH: 50
+    };
 
-      clearInterval(timer);
-      const current = ++sequence;
+    function makeButton(label, callback) {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.textContent = label;
 
-      header.textContent = title;
-      screen.textContent = "";
+      button.style.cssText = `
+        display: block;
+        width: 100%;
+        min-height: 44px;
+        padding: 10px;
+        color: #d5f6df;
+        background: #173c29;
+        border: 1px solid #69d89b;
+        border-radius: 6px;
+        font-family: monospace;
+        font-size: 12px;
+        cursor: pointer;
+      `;
+
+      button.addEventListener("click", () => {
+        if (active) callback();
+      });
+
+      return button;
+    }
+
+    function buildControls() {
+      controls.replaceChildren();
       actions.replaceChildren();
 
-      function finish() {
-        if (!active || current !== sequence) return;
+      header.textContent =
+        "ENVIRONMENT CONTROL PANEL // ONLINE";
 
-        screen.textContent = message;
+      status.textContent =
+        "ALL PARAMETERS WITHIN ACCEPTABLE LIMITS.";
 
-        choices.forEach(([label, callback]) => {
-          const button = document.createElement("button");
-          button.type = "button";
-          button.textContent = label;
+      for (const name of Object.keys(values)) {
+        const group = document.createElement("div");
 
-          button.style.cssText = `
-            min-height: 44px;
-            padding: 12px;
-            background: #193a28;
-            color: #e0f4e6;
-            border: 1px solid #77ad84;
-            border-radius: 6px;
-            font-family: monospace;
-            font-size: 12px;
-            cursor: pointer;
-          `;
+        const label = document.createElement("label");
+        label.style.cssText = `
+          display: flex;
+          justify-content: space-between;
+          margin-bottom: 5px;
+        `;
 
-          button.addEventListener("click", () => {
-            if (active) callback();
-          });
+        const nameText = document.createElement("span");
+        nameText.textContent = name;
 
-          actions.appendChild(button);
+        const valueText = document.createElement("span");
+        valueText.textContent = values[name] + "%";
+
+        const slider = document.createElement("input");
+        slider.type = "range";
+        slider.min = "0";
+        slider.max = "100";
+        slider.step = "5";
+        slider.value = String(values[name]);
+
+        slider.style.cssText = `
+          width: 100%;
+          accent-color: #69d89b;
+          cursor: pointer;
+        `;
+
+        label.append(nameText, valueText);
+        label.htmlFor = "r3-" + name;
+        slider.id = "r3-" + name;
+
+        slider.addEventListener("input", () => {
+          if (!active || released) return;
+
+          values[name] = Number(slider.value);
+          valueText.textContent = values[name] + "%";
+
+          attempts++;
+
+          status.textContent =
+            "PARAMETER: " + name + "\n" +
+            "CHANGE ACCEPTED.\n" +
+            "ENVIRONMENT UNCHANGED.";
+
+          if (attempts >= 3 && !actions.hasChildNodes()) {
+            actions.appendChild(
+              makeButton("RELEASE CONTROL", release)
+            );
+          }
         });
+
+        group.append(label, slider);
+        controls.appendChild(group);
       }
-
-      if (reducedMotion) {
-        finish();
-        return;
-      }
-
-      let index = 0;
-
-      timer = setInterval(() => {
-        if (!active || current !== sequence) {
-          clearInterval(timer);
-          return;
-        }
-
-        index = Math.min(index + 3, message.length);
-        screen.textContent =
-          message.slice(0, index) +
-          (index < message.length ? "▌" : "");
-
-        if (index >= message.length) {
-          clearInterval(timer);
-          timer = null;
-          finish();
-        }
-      }, 22);
     }
 
-    function start() {
-      firstChoice = "";
+    function release() {
+      released = true;
 
-      display(
-        "COMPLIANCE ASSESSMENT // ACTIVE",
-        "INSTRUCTION 01:\n\n" +
-        "DO NOT PRESS THE BUTTON.",
-        [
-          ["PRESS THE BUTTON", () => instructionTwo("pressed")],
-          ["DO NOTHING", () => instructionTwo("waited")]
-        ]
+      header.textContent =
+        "ENVIRONMENT CONTROL PANEL // OFFLINE";
+
+      controls.replaceChildren();
+      actions.replaceChildren();
+
+      status.textContent =
+        "CONTROL RELEASED.\n\n" +
+        "NO PARAMETERS REQUIRED.\n" +
+        "NO PERMISSION NECESSARY.\n\n" +
+        "YOU MAY CONTINUE.";
+
+      actions.appendChild(
+        makeButton("RESTART PANEL", restart)
       );
     }
 
-    function instructionTwo(choice) {
-      firstChoice = choice;
+    function restart() {
+      released = false;
+      attempts = 0;
 
-      const evaluation = choice === "pressed"
-        ? "SUBJECT DISOBEYED.\nAUTONOMY FLAGGED AS SUSPICIOUS."
-        : "SUBJECT OBEYED.\nDEPENDENCE FLAGGED AS SUSPICIOUS.";
+      values.REALITY = 50;
+      values.FREEDOM = 50;
+      values.TRUTH = 50;
 
-      display(
-        "BEHAVIORAL EVALUATION // IN PROGRESS",
-        evaluation + "\n\n" +
-        "INSTRUCTION 02:\n\n" +
-        "SELECT THE CORRECT ANSWER.\n" +
-        "THERE IS NO CORRECT ANSWER.",
-        [
-          ["YES", () => finish("YES")],
-          ["NO", () => finish("NO")]
-        ]
-      );
+      buildControls();
     }
 
-    function finish(answer) {
-      const observation = answer === "YES"
-        ? "SUBJECT AFFIRMED AN UNDEFINED STATEMENT."
-        : "SUBJECT DENIED AN UNDEFINED STATEMENT.";
-
-      display(
-        "ASSESSMENT COMPLETE // REVIEW REQUIRED",
-        observation + "\n\n" +
-        "INITIAL RESPONSE: " +
-        firstChoice.toUpperCase() + "\n\n" +
-        "COMPLIANCE: INDETERMINATE.\n\n" +
-        "SUBJECT DEMONSTRATES AN UNAUTHORIZED " +
-        "CAPACITY FOR CHOICE.\n\n" +
-        "RECOMMENDATION:\n" +
-        "CONTINUE OBSERVATION.",
-        [
-          ["RESTART TEST", start]
-        ]
-      );
-    }
-
-    start();
+    buildControls();
 
     return () => {
       active = false;
-      ++sequence;
-      clearInterval(timer);
       terminal.remove();
     };
   }
