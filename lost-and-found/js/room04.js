@@ -3,7 +3,7 @@
 
 /*
  * RABBITHOLELAB — LOST & FOUND
- * ROOM 04 — CONTROL PANEL
+ * ROOM 04 — THE COMPLIANCE TEST
  */
 
 window.roomInteractions ??= {};
@@ -11,192 +11,185 @@ window.roomInteractions ??= {};
 window.roomInteractions[4] = {
   mount(container) {
     let active = true;
-    let attempts = 0;
-    let released = false;
+    let timer = null;
+    let sequence = 0;
+    let firstChoice = "";
+
+    const reducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)"
+    ).matches;
 
     const terminal = document.createElement("section");
     terminal.style.cssText = `
-      background: #08140f;
-      border: 1px solid #31583f;
+      background: #09130e;
+      border: 1px solid #43634b;
       border-radius: 8px;
-      padding: 14px 10px;
-      color: #d5f6df;
+      padding: 18px 12px;
+      color: #d7eddd;
       font-family: monospace;
-      font-size: 12px;
       text-align: center;
+      overflow-wrap: anywhere;
     `;
 
     const header = document.createElement("div");
     header.style.cssText = `
-      color: #8dd2a5;
+      color: #8bc69c;
       font-size: 11px;
       letter-spacing: 1px;
-      margin-bottom: 12px;
+      margin-bottom: 16px;
     `;
 
-    const controls = document.createElement("div");
-    controls.style.cssText = `
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    `;
-
-    const status = document.createElement("div");
-    status.setAttribute("role", "status");
-    status.setAttribute("aria-live", "polite");
-    status.style.cssText = `
-      border-top: 1px solid #31583f;
-      margin-top: 10px;
-      padding: 10px 4px;
-      color: #8dd2a5;
+    const screen = document.createElement("div");
+    screen.style.cssText = `
+      min-height: 145px;
+      padding: 20px 8px;
+      border-top: 1px solid #345b42;
+      border-bottom: 1px solid #345b42;
       white-space: pre-line;
-      line-height: 1.5;
-      min-height: 90px;
-      height: auto;
-      overflow: visible;
+      line-height: 1.8;
+      font-size: 13px;
     `;
+    screen.setAttribute("role", "status");
+    screen.setAttribute("aria-live", "polite");
 
     const actions = document.createElement("div");
-    actions.style.marginTop = "12px";
+    actions.style.cssText = `
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 18px;
+    `;
 
-    terminal.append(header, controls, status, actions);
+    terminal.append(header, screen, actions);
     container.appendChild(terminal);
 
-    const values = {
-      REALITY: 50,
-      FREEDOM: 50,
-      TRUTH: 50
-    };
+    function display(title, message, choices) {
+      if (!active) return;
 
-    function makeButton(label, callback) {
-      const button = document.createElement("button");
-      button.type = "button";
-      button.textContent = label;
+      clearInterval(timer);
+      const current = ++sequence;
 
-      button.style.cssText = `
-        display: block;
-        width: 100%;
-        min-height: 44px;
-        padding: 10px;
-        color: #d5f6df;
-        background: #173c29;
-        border: 1px solid #69d89b;
-        border-radius: 6px;
-        font-family: monospace;
-        font-size: 12px;
-        cursor: pointer;
-      `;
-
-      button.addEventListener("click", () => {
-        if (active) callback();
-      });
-
-      return button;
-    }
-
-    function buildControls() {
-      controls.replaceChildren();
+      header.textContent = title;
+      screen.textContent = "";
       actions.replaceChildren();
 
-      header.textContent =
-        "ENVIRONMENT CONTROL PANEL // ONLINE";
+      function finish() {
+        if (!active || current !== sequence) return;
 
-      status.textContent =
-        "ALL PARAMETERS WITHIN ACCEPTABLE LIMITS.";
+        screen.textContent = message;
 
-      for (const name of Object.keys(values)) {
-        const group = document.createElement("div");
+        choices.forEach(([label, callback]) => {
+          const button = document.createElement("button");
+          button.type = "button";
+          button.textContent = label;
 
-        const label = document.createElement("label");
-        label.style.cssText = `
-          display: flex;
-          justify-content: space-between;
-          margin-bottom: 5px;
-        `;
+          button.style.cssText = `
+            min-height: 44px;
+            padding: 12px;
+            background: #193a28;
+            color: #e0f4e6;
+            border: 1px solid #77ad84;
+            border-radius: 6px;
+            font-family: monospace;
+            font-size: 12px;
+            cursor: pointer;
+          `;
 
-        const nameText = document.createElement("span");
-        nameText.textContent = name;
+          button.addEventListener("click", () => {
+            if (active) callback();
+          });
 
-        const valueText = document.createElement("span");
-        valueText.textContent = values[name] + "%";
-
-        const slider = document.createElement("input");
-        slider.type = "range";
-        slider.min = "0";
-        slider.max = "100";
-        slider.step = "5";
-        slider.value = String(values[name]);
-
-        slider.style.cssText = `
-          width: 100%;
-          accent-color: #69d89b;
-          cursor: pointer;
-        `;
-
-        label.append(nameText, valueText);
-        label.htmlFor = "r4-" + name;
-        slider.id = "r4-" + name;
-
-        slider.addEventListener("input", () => {
-          if (!active || released) return;
-
-          values[name] = Number(slider.value);
-          valueText.textContent = values[name] + "%";
-
-          attempts++;
-
-          status.textContent =
-            "PARAMETER: " + name + "\n" +
-            "CHANGE ACCEPTED.\n" +
-            "ENVIRONMENT UNCHANGED.";
-
-          if (attempts >= 3 && !actions.hasChildNodes()) {
-            actions.appendChild(
-              makeButton("RELEASE CONTROL", release)
-            );
-          }
+          actions.appendChild(button);
         });
-
-        group.append(label, slider);
-        controls.appendChild(group);
       }
+
+      if (reducedMotion) {
+        finish();
+        return;
+      }
+
+      let index = 0;
+
+      timer = setInterval(() => {
+        if (!active || current !== sequence) {
+          clearInterval(timer);
+          return;
+        }
+
+        index = Math.min(index + 3, message.length);
+        screen.textContent =
+          message.slice(0, index) +
+          (index < message.length ? "▌" : "");
+
+        if (index >= message.length) {
+          clearInterval(timer);
+          timer = null;
+          finish();
+        }
+      }, 22);
     }
 
-    function release() {
-      released = true;
+    function start() {
+      firstChoice = "";
 
-      header.textContent =
-        "ENVIRONMENT CONTROL PANEL // OFFLINE";
-
-      controls.replaceChildren();
-      actions.replaceChildren();
-
-      status.textContent =
-        "CONTROL RELEASED.\n\n" +
-        "NO PARAMETERS REQUIRED.\n" +
-        "NO PERMISSION NECESSARY.\n\n" +
-        "YOU MAY CONTINUE.";
-
-      actions.appendChild(
-        makeButton("RESTART PANEL", restart)
+      display(
+        "COMPLIANCE ASSESSMENT // ACTIVE",
+        "INSTRUCTION 01:\n\n" +
+        "DO NOT PRESS THE BUTTON.",
+        [
+          ["PRESS THE BUTTON", () => instructionTwo("pressed")],
+          ["DO NOTHING", () => instructionTwo("waited")]
+        ]
       );
     }
 
-    function restart() {
-      released = false;
-      attempts = 0;
+    function instructionTwo(choice) {
+      firstChoice = choice;
 
-      values.REALITY = 50;
-      values.FREEDOM = 50;
-      values.TRUTH = 50;
+      const evaluation = choice === "pressed"
+        ? "SUBJECT DISOBEYED.\nAUTONOMY FLAGGED AS SUSPICIOUS."
+        : "SUBJECT OBEYED.\nDEPENDENCE FLAGGED AS SUSPICIOUS.";
 
-      buildControls();
+      display(
+        "BEHAVIORAL EVALUATION // IN PROGRESS",
+        evaluation + "\n\n" +
+        "INSTRUCTION 02:\n\n" +
+        "SELECT THE CORRECT ANSWER.\n" +
+        "THERE IS NO CORRECT ANSWER.",
+        [
+          ["YES", () => finish("YES")],
+          ["NO", () => finish("NO")]
+        ]
+      );
     }
 
-    buildControls();
+    function finish(answer) {
+      const observation = answer === "YES"
+        ? "SUBJECT AFFIRMED AN UNDEFINED STATEMENT."
+        : "SUBJECT DENIED AN UNDEFINED STATEMENT.";
+
+      display(
+        "ASSESSMENT COMPLETE // REVIEW REQUIRED",
+        observation + "\n\n" +
+        "INITIAL RESPONSE: " +
+        firstChoice.toUpperCase() + "\n\n" +
+        "COMPLIANCE: INDETERMINATE.\n\n" +
+        "SUBJECT DEMONSTRATES AN UNAUTHORIZED " +
+        "CAPACITY FOR CHOICE.\n\n" +
+        "RECOMMENDATION:\n" +
+        "CONTINUE OBSERVATION.",
+        [
+          ["RESTART TEST", start]
+        ]
+      );
+    }
+
+    start();
 
     return () => {
       active = false;
+      ++sequence;
+      clearInterval(timer);
       terminal.remove();
     };
   }
