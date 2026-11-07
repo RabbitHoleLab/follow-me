@@ -75,10 +75,10 @@ window.roomInteractions[15] = {
 
     const screen = document.createElement("div");
     screen.style.cssText = `
-      height: 190px;
+      height: 155px;
       box-sizing: border-box;
       overflow-y: auto;
-      padding: 16px 8px;
+      padding: 12px 8px;
       border: 1px solid #665d3e;
       border-radius: 5px;
       background: #222318;
@@ -91,10 +91,11 @@ window.roomInteractions[15] = {
 
     const response = document.createElement("div");
     response.style.cssText = `
-      min-height: 105px;
+      height: 105px;
       box-sizing: border-box;
-      margin-top: 14px;
-      padding: 12px 8px;
+      overflow-y: auto;
+      margin-top: 12px;
+      padding: 10px 8px;
       color: #d7c98d;
       white-space: pre-line;
       line-height: 1.6;
@@ -102,6 +103,14 @@ window.roomInteractions[15] = {
     `;
     response.setAttribute("role", "status");
     response.setAttribute("aria-live", "polite");
+
+    const counter = document.createElement("div");
+    counter.style.cssText = `
+      margin-top: 8px;
+      color: #93875c;
+      font-size: 10px;
+      letter-spacing: 0.5px;
+    `;
 
     const actions = document.createElement("div");
     actions.style.cssText = `
@@ -165,7 +174,15 @@ window.roomInteractions[15] = {
         notice.body;
     }
 
+    function renderCounter() {
+      counter.textContent =
+        "CRITICAL THINKING INCIDENTS: " +
+        String(reports).padStart(2, "0");
+    }
+
     function report() {
+      if (!active) return;
+
       reports++;
 
       if (reports === 1) {
@@ -183,17 +200,33 @@ window.roomInteractions[15] = {
           "COMPLIANCE WAS NEVER THE OBJECTIVE.\n" +
           "YOUR REACTION WAS.";
       }
+
+      response.scrollTop = 0;
+      renderCounter();
     }
 
-    terminal.append(heading, board, screen, response, actions);
+    terminal.append(
+      heading,
+      board,
+      screen,
+      response,
+      counter,
+      actions
+    );
+
     container.appendChild(terminal);
 
     actions.appendChild(
       makeButton("REPORT A CONTRADICTION", report)
     );
 
+    response.textContent =
+      "NOTICE COMPLIANCE MONITORING ACTIVE.\n\n" +
+      "NO CONTRADICTIONS HAVE BEEN REPORTED.";
+
     renderBoard();
     renderNotice();
+    renderCounter();
 
     return () => {
       active = false;
