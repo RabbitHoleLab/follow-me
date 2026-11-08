@@ -1,21 +1,24 @@
 "use strict";
 
+"use strict";
+
 /*
- * RABBITHOLELAB — LOST & FOUND
- * ROOM 14 — LOST PROPERTY
+ * RABBITHOLELAB — ROOM 14
  *
- * Le bureau des objets trouvés, sur la table de chevet : six objets "prêtés" au joueur
- * (histoire, rôle, opinion...). Pour chacun : GARDER (bleu) ou RENDRE (rouge).
- * Aucune réponse n'est la bonne. Puis une étiquette vierge : "SOMETHING YOU LOST".
- * Rien n'est enregistré ni envoyé.
- * Discret : un réveil bloqué sur 01:08 (touche SNOOZE).
+ * OH.
  *
- * Installation :
- *   1. ce fichier dans js/room14.js
- *   2. dans map.js : AJOUTE 14 à la liste existante de interactiveRooms
- *      (ne remplace pas la liste : garde les numéros déjà présents).
+ * YOU'RE READING THE SOURCE CODE.
  *
- * Tous les textes sont dans TEXT, les réglages dans CONFIG.
+ * THAT'S ADORABLE.
+ *
+ * DID YOU THINK THE ANSWERS WERE HERE?
+ *
+ * THE RABBIT SAYS HELLO.
+ * THE RABBIT DENIES EVERYTHING.
+ *
+ * ALSO, YOU'RE LATE.
+ *
+ * NO, WE WON'T TELL YOU FOR WHAT.
  */
 
 window.roomInteractions = window.roomInteractions || {};
