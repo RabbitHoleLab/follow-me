@@ -1,7 +1,5 @@
 "use strict";
 
-"use strict";
-
 /*
  * RABBITHOLELAB — ROOM 14
  *
