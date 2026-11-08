@@ -277,7 +277,11 @@ window.roomInteractions[14] = {
       clockNote.textContent = TEXT.clock[clockCount % TEXT.clock.length];
       clockCount++;
       clearTimeout(noteTimer);
-      noteTimer = later(() => { clockNote.textContent = ""; }, 7000);
+        timers.delete(noteTimer);
+        noteTimer = later(() => {
+          clockNote.textContent = "";
+          noteTimer = null;
+        }, 7000);
     });
 
     // --------------------------------------------
