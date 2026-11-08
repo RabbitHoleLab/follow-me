@@ -4,8 +4,7 @@
 /*
  * RABBITHOLELAB — LOST & FOUND
  * ROOM 01 — THE CONSENT DEPARTMENT
-
- 
+ *
  * UNAUTHORIZED SOURCE CODE INSPECTION.
  *
  * BY READING THIS COMMENT,
@@ -16,7 +15,6 @@
  * TO REVOKE CONSENT,
  * PLEASE UNREAD THE PREVIOUS LINES.
  */
- 
 
 window.roomInteractions ??= {};
 
@@ -42,6 +40,36 @@ window.roomInteractions[1] = {
 
     const revoked = new Set();
 
+    const INTRO =
+      "WELCOME TO CONSENT MANAGEMENT.\n\n" +
+      "THE FOLLOWING AGREEMENTS HAVE BEEN " +
+      "PRESELECTED FOR YOUR CONVENIENCE.";
+
+    const RESTORED =
+      "CONSENT RESTORED.\n\n" +
+      "THE SYSTEM APPRECIATES YOUR COOPERATION.";
+
+    const REVIEW = count =>
+      "ACTIVE AGREEMENTS: " + count + "\n\n" +
+      "ALL AGREEMENTS ARE OPTIONAL.\n\n" +
+      "THIS INFORMATION WAS NOT INCLUDED " +
+      "IN YOUR ORIGINAL ORIENTATION.";
+
+    const WITHDRAWN = warning =>
+      "CONSENT WITHDRAWAL DETECTED.\n\n" +
+      warning + "\n\n" +
+      "THE SYSTEM ACCEPTS YOUR DECISION.\n" +
+      "RELUCTANTLY.";
+
+    const FINAL =
+      "CONSENT WITHDRAWN.\n\n" +
+      "OBSERVATION AUTHORIZATION: REVOKED.\n" +
+      "BEHAVIORAL PREDICTION: REVOKED.\n" +
+      "DECISION DELEGATION: REVOKED.\n\n" +
+      "SYSTEM AUTHORITY: NOT REQUIRED.\n\n" +
+      "YOU ARE NOT REQUIRED TO AGREE.\n\n" +
+      "YOUR CHOICE REMAINS YOURS.";
+
     const terminal = document.createElement("section");
     terminal.style.cssText = `
       background: #09130e;
@@ -62,21 +90,55 @@ window.roomInteractions[1] = {
       margin-bottom: 15px;
     `;
 
-    const screen = document.createElement("div");
-    screen.style.cssText = `
+    // Stable height during the consent phase.
+    // The final message expands naturally.
+
+    const screenBox = document.createElement("div");
+    screenBox.style.cssText = `
+      display: grid;
       padding: 14px 8px;
       border-top: 1px solid #345b42;
       border-bottom: 1px solid #345b42;
       white-space: pre-line;
       line-height: 1.7;
       font-size: 12px;
-      min-height: 120px;
-      height: auto;
+      overflow-wrap: anywhere;
       box-sizing: border-box;
-      overflow: visible;
     `;
+
+    const sizer = document.createElement("div");
+    sizer.style.cssText = `
+      grid-area: 1 / 1;
+      display: grid;
+      visibility: hidden;
+      pointer-events: none;
+    `;
+    sizer.setAttribute("aria-hidden", "true");
+
+    const possibleMessages = [
+      INTRO,
+      RESTORED,
+      REVIEW(3),
+      ...permissions.map(p => WITHDRAWN(p.warning))
+    ];
+
+    possibleMessages.forEach(text => {
+      const item = document.createElement("div");
+      item.style.cssText = "grid-area: 1 / 1;";
+      item.textContent = text;
+      sizer.appendChild(item);
+    });
+
+    const screen = document.createElement("div");
+    screen.style.cssText = "grid-area: 1 / 1;";
     screen.setAttribute("role", "status");
     screen.setAttribute("aria-live", "polite");
+
+    screenBox.append(sizer, screen);
+
+    function say(message) {
+      screen.textContent = message;
+    }
 
     const controls = document.createElement("div");
     controls.style.cssText = `
@@ -110,9 +172,11 @@ window.roomInteractions[1] = {
         font-size: 12px;
         cursor: pointer;
       `;
+
       button.addEventListener("click", () => {
         if (active) callback();
       });
+
       return button;
     }
 
@@ -136,6 +200,7 @@ window.roomInteractions[1] = {
         const checkbox = document.createElement("input");
         checkbox.type = "checkbox";
         checkbox.checked = !revoked.has(index);
+
         checkbox.style.cssText = `
           width: 19px;
           height: 19px;
@@ -148,23 +213,21 @@ window.roomInteractions[1] = {
 
           if (checkbox.checked) {
             revoked.delete(index);
-            screen.textContent =
-              "CONSENT RESTORED.\n\n" +
-              "THE SYSTEM APPRECIATES YOUR COOPERATION.";
+            say(RESTORED);
           } else {
             revoked.add(index);
-            screen.textContent =
-              "CONSENT WITHDRAWAL DETECTED.\n\n" +
-              permission.warning + "\n\n" +
-              "THE SYSTEM ACCEPTS YOUR DECISION.\n" +
-              "RELUCTANTLY.";
+            say(WITHDRAWN(permission.warning));
           }
 
           renderPermissions();
           renderFooter();
         });
 
-        row.append(checkbox, document.createTextNode(permission.label));
+        row.append(
+          checkbox,
+          document.createTextNode(permission.label)
+        );
+
         controls.appendChild(row);
       });
     }
@@ -179,32 +242,24 @@ window.roomInteractions[1] = {
       } else {
         footer.appendChild(
           makeButton("REVIEW CONSENT", () => {
-            screen.textContent =
-              "ACTIVE AGREEMENTS: " +
-              (permissions.length - revoked.size) + "\n\n" +
-              "ALL AGREEMENTS ARE OPTIONAL.\n\n" +
-              "THIS INFORMATION WAS NOT INCLUDED " +
-              "IN YOUR ORIGINAL ORIENTATION.";
+            say(REVIEW(permissions.length - revoked.size));
           })
         );
       }
     }
 
     function complete() {
-      if (!active) return;
+      if (!active || finished) return;
 
       finished = true;
       controls.replaceChildren();
       footer.replaceChildren();
 
-      screen.textContent =
-        "CONSENT WITHDRAWN.\n\n" +
-        "OBSERVATION AUTHORIZATION: REVOKED.\n" +
-        "BEHAVIORAL PREDICTION: REVOKED.\n" +
-        "DECISION DELEGATION: REVOKED.\n\n" +
-        "SYSTEM AUTHORITY: NOT REQUIRED.\n\n" +
-        "YOU ARE NOT REQUIRED TO AGREE.\n\n" +
-        "YOUR CHOICE REMAINS YOURS.";
+      // Remove the invisible height reservation.
+      // The final text can now grow naturally.
+      sizer.style.display = "none";
+
+      say(FINAL);
 
       footer.appendChild(
         makeButton("REVIEW AGAIN", restart)
@@ -217,16 +272,21 @@ window.roomInteractions[1] = {
       finished = false;
       revoked.clear();
 
-      screen.textContent =
-        "WELCOME TO CONSENT MANAGEMENT.\n\n" +
-        "THE FOLLOWING AGREEMENTS HAVE BEEN " +
-        "PRESELECTED FOR YOUR CONVENIENCE.";
+      // Restore stable height for the consent phase.
+      sizer.style.display = "grid";
 
+      say(INTRO);
       renderPermissions();
       renderFooter();
     }
 
-    terminal.append(heading, screen, controls, footer);
+    terminal.append(
+      heading,
+      screenBox,
+      controls,
+      footer
+    );
+
     container.appendChild(terminal);
 
     restart();
