@@ -3,9 +3,18 @@
 /*
  * RABBITHOLELAB — LOST & FOUND
  * ROOM 07 — OBSERVATION ROOM
- * Terminal effects edition — v2 (effets plus visibles)
- * Les modifications par rapport à ta version sont marquées ★
+ *
+ *
+ * YOU ARE INSPECTING THE CODE.
+ *
+ * THE CODE IS INSPECTING YOU.
+ *
+ * ONE OF YOU IS DOING A BETTER JOB.
+ *
+ * WE ARE NOT AUTHORIZED
+ * TO DISCLOSE WHICH ONE.
  */
+ 
 
 window.roomInteractions = window.roomInteractions || {};   // ★ compatible anciens navigateurs
 
