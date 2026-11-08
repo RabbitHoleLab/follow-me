@@ -1,22 +1,20 @@
 "use strict";
 
 /*
- * RABBITHOLELAB — LOST & FOUND
- * ROOM 17 — THE THRESHOLD
- * Mini-jeu : « la porte qui s'éloigne »
+ * RABBITHOLELAB — ROOM 17
  *
- * Installation :
- *   1. ce fichier dans js/room17.js
- *   2. dans map.js : AJOUTE 17 à la liste existante de interactiveRooms
- *      (ne remplace pas la liste : garde les numéros déjà présents).
+ * YOU HAVE REACHED THE SOURCE CODE.
  *
- * Règles (cachées au joueur) :
- *   - si tu marches VERS la porte, elle recule d'un pas (la distance ne change pas) ;
- *   - quand elle est acculée au mur, elle quitte le couloir et réapparaît à l'autre bout ;
- *   - si tu tournes le dos, elle te suit ;
- *   - une fois au seuil : OUVRIR, RESTER ou RECULER. Rester est un vrai choix.
+ * THE DOOR WAS HERE A MOMENT AGO.
  *
- * Tous les textes sont dans TEXT, les réglages dans CONFIG.
+ * IT HAS BEEN INFORMED OF YOUR ARRIVAL.
+ *
+ * PLEASE REMAIN CALM.
+ * PLEASE REMAIN WHERE YOU ARE.
+ *
+ * THE DOOR WILL NOT.
+ *
+ * — THRESHOLD MANAGEMENT
  */
 
 window.roomInteractions = window.roomInteractions || {};
