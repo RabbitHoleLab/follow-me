@@ -4,9 +4,10 @@
  * RABBITHOLELAB — LOST & FOUND
  * ROOM 14 — LOST PROPERTY
  *
- * Le bureau des objets trouvés : six objets "prêtés" au joueur (histoire, rôle, opinion...).
- * Il choisit pour chacun GARDER (bleu) ou RENDRE (rouge). Aucune réponse n'est la bonne.
- * Puis une étiquette vierge : "SOMETHING YOU LOST". Rien n'est enregistré ni envoyé.
+ * Le bureau des objets trouvés, sur la table de chevet : six objets "prêtés" au joueur
+ * (histoire, rôle, opinion...). Pour chacun : GARDER (bleu) ou RENDRE (rouge).
+ * Aucune réponse n'est la bonne. Puis une étiquette vierge : "SOMETHING YOU LOST".
+ * Rien n'est enregistré ni envoyé.
  * Discret : un réveil bloqué sur 01:08 (touche SNOOZE).
  *
  * Installation :
@@ -22,8 +23,15 @@ window.roomInteractions = window.roomInteractions || {};
 window.roomInteractions[14] = {
   mount(container) {
     let active = true;
-    const timers = [];
-    const later = (fn, ms) => { const id = setTimeout(fn, ms); timers.push(id); return id; };
+
+    // minuteurs : ensemble nettoyé à chaque redémarrage et à la fermeture
+    const timers = new Set();
+    const later = (fn, ms) => {
+      const id = setTimeout(() => { timers.delete(id); fn(); }, ms);
+      timers.add(id);
+      return id;
+    };
+    const clearTimers = () => { timers.forEach(id => clearTimeout(id)); timers.clear(); };
 
     const reducedMotion = window.matchMedia(
       "(prefers-reduced-motion: reduce)"
@@ -31,7 +39,8 @@ window.roomInteractions[14] = {
 
     const CONFIG = {
       maxNote: 40,          // longueur max de ce que le joueur peut écrire
-      revealMs: 1100        // pause entre les phrases de la fin
+      groupMs: 1600,        // durée de base de chaque phrase de la fin...
+      perCharMs: 28         // ...plus un peu de temps selon sa longueur
     };
 
     // --------------------------------------------
@@ -41,7 +50,7 @@ window.roomInteractions[14] = {
     const TEXT = {
       intro:
         "LOST PROPERTY.\n" +
-        "ITEMS FOUND IN THIS ROOM: 6.\n" +
+        "ITEMS FOUND ON AND AROUND THE BED: 6.\n" +
         "OWNER: NOT RECORDED.\n\n" +
         "THE DESK IS NOT ACCUSING ANYONE.\n" +
         "(THE DESK HAS A LIST.)",
@@ -82,12 +91,12 @@ window.roomInteractions[14] = {
       label: "ITEM 07 / 07\n\nSOMETHING YOU LOST:",
       labelHint: "(OPTIONAL. NOTHING YOU WRITE HERE LEAVES THIS PAGE.)",
 
-      // le réveil bloqué sur 01:08 (les messages tournent)
+      // le réveil bloqué sur 01:08 : chaque SNOOZE repousse quelque chose (les messages tournent)
       clock: [
-        "SNOOZE: 9 MINUTES. TIME REMAINS 01:08.",
-        "SNOOZE AGAIN? THE CLOCK ADMIRES YOUR OPTIMISM.",
-        "THE ALARM IS NOT BROKEN. IT IS WAITING.",
-        "01:08."
+        "SNOOZE: 9 MINUTES.\nYOU CAN THINK ABOUT IT TOMORROW.",
+        "SNOOZE AGAIN.\nTOMORROW HAS BEEN RESCHEDULED.",
+        "THE ALARM IS NOT BROKEN.\nTHE CLOCK IS WAITING FOR YOU TO WAKE UP.\n(NO RUSH.)",
+        "STILL 01:08."
       ]
     };
 
@@ -100,6 +109,19 @@ window.roomInteractions[14] = {
     let returned = 0;
     let clockCount = 0;
     let noteTimer = null;
+    let finaleRun = 0;
+
+    // La fin, une phrase à la fois (le joueur lit chaque phrase seule, rien ne s'accumule).
+    function finaleGroups(note, k = kept, r = returned) {
+      return [
+        note
+          ? "FILED: \u201C" + note + "\u201D\nNOTHING YOU WRITE HERE LEAVES THIS PAGE."
+          : "FORM LEFT BLANK.\nBLANK FORMS ARE ALLOWED.\nSOME THINGS ARE NOT LOST. THEY ARE ONLY QUIET.",
+        "PERHAPS NOTHING WAS MISSING.\nPERHAPS IT WAS ONLY SOMEWHERE ELSE.\n(THE DESK CANNOT TELL. THE DESK IS A DESK.)",
+        "ITEMS KEPT: " + k + "   ITEMS RETURNED: " + r + "\nNEITHER NUMBER IS THE RIGHT ONE.",
+        "THE WHITE RABBIT WAS NEVER LEADING YOU.\nIT WAS KEEPING YOU COMPANY."
+      ];
+    }
 
     // --------------------------------------------
     // INTERFACE
@@ -110,6 +132,21 @@ window.roomInteractions[14] = {
       if (css) e.style.cssText = css;
       if (text) e.textContent = text;
       return e;
+    }
+
+    // Zone de texte à hauteur stable : toutes les phrases possibles sont superposées (invisibles)
+    // dans la même cellule de grille, qui prend la hauteur de la plus longue, quelle que soit la
+    // largeur de l'écran. Le texte visible est dans "live" (lu par les lecteurs d'écran).
+    function stableBox(boxCss, strings) {
+      const box = el("div", "display: grid; " + boxCss);
+      const sizer = el("div", `grid-area: 1 / 1; display: grid; visibility: hidden; pointer-events: none;`);
+      sizer.setAttribute("aria-hidden", "true");
+      strings.forEach(t => sizer.appendChild(el("div", `grid-area: 1 / 1;`, t)));
+      const live = el("div", `grid-area: 1 / 1;`);
+      live.setAttribute("role", "status");
+      live.setAttribute("aria-live", "polite");
+      box.append(sizer, live);
+      return { box, live, sizer };
     }
 
     const fx = el("style");
@@ -123,7 +160,6 @@ window.roomInteractions[14] = {
       .r14-btn { transition: filter .15s, box-shadow .15s; }
       .r14-btn:hover:not(:disabled)  { filter: brightness(1.25); box-shadow: 0 0 14px currentColor; }
       .r14-btn:active:not(:disabled) { transform: translateY(1px); }
-      .r14-btn:disabled { opacity: .45; cursor: default !important; }
       .r14-input:focus-visible { outline: 2px solid #69d89b; outline-offset: 2px; }
       @media (prefers-reduced-motion: reduce) {
         .r14-pulse, .r14-clock, .r14-fade { animation: none !important; }
@@ -151,34 +187,31 @@ window.roomInteractions[14] = {
     clock.setAttribute("aria-label", "Alarm clock, stuck at 01:08. Press to snooze.");
     header.appendChild(clock);
 
-    const clockNote = el("p", `font-size: 10px; letter-spacing: .5px; color: #d99; margin: 6px 8px 0; min-height: 14px; text-align: right;`);
-    clockNote.setAttribute("aria-live", "polite");
+    // message du réveil (hauteur stable aussi : plus de saut quand il apparaît ou disparaît)
+    const noteBox = stableBox(`
+      font-size: 10px; letter-spacing: .5px; line-height: 1.4; color: #d99;
+      margin: 6px 8px 0; text-align: right; white-space: pre-line;
+    `, TEXT.clock);
+    const clockNote = noteBox.live;
 
     const indicator = el("p", `color: #69d89b; font-size: 11px; letter-spacing: 1px; margin: 12px 0 12px;`);
 
-    // Hauteur stable pendant tout l'inventaire : les phrases possibles sont superposées (invisibles)
-    // dans la même cellule de grille. La fin (plus longue) s'agrandit simplement, sans barre de défilement.
-    const screenBox = el("div", `
-      display: grid; margin: 0 4px; padding: 18px 12px;
+    const screenBox = stableBox(`
+      margin: 0 4px; padding: 18px 12px;
       white-space: pre-line; line-height: 1.8; font-size: 13px; overflow-wrap: anywhere;
       border: 1px dashed #3f8a5d; border-radius: 6px; background: rgba(10, 30, 20, .55);
-    `);
-    const sizer = el("div", `grid-area: 1 / 1; display: grid; visibility: hidden; pointer-events: none;`);
-    sizer.setAttribute("aria-hidden", "true");
-    [TEXT.intro, TEXT.label,
-     ...TEXT.items.flatMap((it, n) => ["ITEM 0" + (n + 1) + " / 07\n\n" + it.ask, it.keep, it.ret])]
-      .forEach(t => sizer.appendChild(el("div", `grid-area: 1 / 1;`, t)));
-
-    const screen = el("div", `grid-area: 1 / 1;`);
-    screen.setAttribute("role", "status");
-    screen.setAttribute("aria-live", "polite");
-    screenBox.append(sizer, screen);
+    `, [
+      TEXT.intro, TEXT.label,
+      ...TEXT.items.flatMap((it, n) => ["ITEM 0" + (n + 1) + " / 07\n\n" + it.ask, it.keep, it.ret]),
+      ...finaleGroups("W".repeat(CONFIG.maxNote), 6, 6)        // cas le plus long de la fin
+    ]);
+    const screen = screenBox.live;
 
     const stats = el("p", `font-size: 11px; letter-spacing: 1px; color: #69d89b; margin: 10px 0 0; opacity: .85;`);
 
     const actions = el("div", `padding: 14px 8px 4px;`);
 
-    terminal.append(fx, header, clockNote, indicator, screenBox, stats, actions);
+    terminal.append(fx, header, noteBox.box, indicator, screenBox.box, stats, actions);
     container.appendChild(terminal);
 
     const BTN_BASE = `
@@ -229,9 +262,7 @@ window.roomInteractions[14] = {
     function pad(n) { return String(n).padStart(2, "0"); }
 
     function setStats() {
-      stats.textContent = index >= TEXT.items.length
-        ? "ITEMS PROCESSED: " + TEXT.items.length + "/" + TEXT.items.length
-        : "ITEMS PROCESSED: " + index + "/" + TEXT.items.length;
+      stats.textContent = "ITEMS PROCESSED: " + Math.min(index, TEXT.items.length) + "/" + TEXT.items.length;
     }
 
     // --------------------------------------------
@@ -243,7 +274,7 @@ window.roomInteractions[14] = {
       clockNote.textContent = TEXT.clock[clockCount % TEXT.clock.length];
       clockCount++;
       clearTimeout(noteTimer);
-      noteTimer = later(() => { clockNote.textContent = ""; }, 6000);
+      noteTimer = later(() => { clockNote.textContent = ""; }, 7000);
     });
 
     // --------------------------------------------
@@ -251,6 +282,9 @@ window.roomInteractions[14] = {
     // --------------------------------------------
 
     function start() {
+      clearTimers();                 // plus aucun minuteur d'une partie précédente
+      finaleRun++;                   // et la séquence de fin éventuelle est annulée
+      clockNote.textContent = "";
       index = 0; kept = 0; returned = 0;
       setIndicator("● LOST PROPERTY OFFICE — OPEN");
       setStats();
@@ -309,35 +343,51 @@ window.roomInteractions[14] = {
       input.focus({ preventScroll: true });
     }
 
-    function finaleGroups(note) {
-      return [
-        note
-          ? "FILED: \u201C" + note + "\u201D\nNOTHING YOU WRITE HERE LEAVES THIS PAGE."
-          : "FORM LEFT BLANK.\nBLANK FORMS ARE ALLOWED.\nSOME THINGS ARE NOT LOST. THEY ARE ONLY QUIET.",
-        "NOTHING IS MISSING.\nIT WAS WAITING FOR YOU TO STOP LOOKING ELSEWHERE.",
-        "ITEMS KEPT: " + kept + "   ITEMS RETURNED: " + returned + "\nNEITHER NUMBER IS THE RIGHT ONE.",
-        "THE WHITE RABBIT WAS NEVER LEADING YOU.\nIT WAS KEEPING YOU COMPANY."
-      ];
-    }
+    // --------------------------------------------
+    // LA FIN — une phrase à la fois
+    // --------------------------------------------
+    // Mouvement normal : les phrases s'enchaînent seules, avec un bouton SKIP.
+    // "Réduire les animations" activé : pas de minuteur, le joueur avance avec NEXT.
 
     function finale(note) {
+      const run = ++finaleRun;
       setIndicator("◈ FILE CLOSED");
-      actions.replaceChildren();
       const groups = finaleGroups(note);
-      const shown = [];
+      const last = groups.length - 1;
+      const stale = () => !active || run !== finaleRun;
+
+      function showEnd() {
+        if (stale()) return;
+        say(groups[last]);
+        const again = makeButton("BACK TO THE DESK", "plain", start);
+        setActions(again);
+        again.focus({ preventScroll: true });
+      }
+
+      if (reducedMotion) {
+        let k = 0;
+        const step = () => {
+          if (stale()) return;
+          if (k === last) { showEnd(); return; }
+          say(groups[k]);
+          k++;
+          const nextBtn = makeButton("NEXT  \u25B6", "plain", step);
+          setActions(nextBtn);
+          nextBtn.focus({ preventScroll: true });
+        };
+        step();
+        return;
+      }
+
+      const skip = makeButton("SKIP  \u25B6", "plain", () => { clearTimers(); showEnd(); });
+      setActions(skip);
+      skip.focus({ preventScroll: true });
 
       (function next(k) {
-        if (!active) return;
-        shown.push(groups[k]);
-        say(shown.join("\n\n"));
-
-        if (k + 1 < groups.length) {
-          later(() => next(k + 1), reducedMotion ? 0 : CONFIG.revealMs);
-        } else {
-          const again = makeButton("BACK TO THE DESK", "plain", start);
-          setActions(again);
-          again.focus({ preventScroll: true });
-        }
+        if (stale()) return;
+        if (k === last) { showEnd(); return; }
+        say(groups[k]);
+        later(() => next(k + 1), CONFIG.groupMs + CONFIG.perCharMs * groups[k].length);
       })(0);
     }
 
@@ -349,7 +399,8 @@ window.roomInteractions[14] = {
 
     return () => {
       active = false;
-      timers.forEach(id => clearTimeout(id));
+      finaleRun++;
+      clearTimers();
       terminal.remove();
     };
   }
