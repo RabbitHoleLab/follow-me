@@ -70,9 +70,10 @@ window.roomInteractions[1] = {
       white-space: pre-line;
       line-height: 1.7;
       font-size: 12px;
-      height: 150px;
+      min-height: 120px;
+      height: auto;
       box-sizing: border-box;
-      overflow-y: auto;
+      overflow: visible;
     `;
     screen.setAttribute("role", "status");
     screen.setAttribute("aria-live", "polite");
