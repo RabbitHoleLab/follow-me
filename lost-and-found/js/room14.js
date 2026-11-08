@@ -375,7 +375,7 @@ window.roomInteractions[14] = {
         let k = 0;
         const step = () => {
           if (stale()) return;
-          if (k === last) { showEnd(); return; }
+          if (k === last) { showFinal(); return; }
           say(groups[k]);
           k++;
           const nextBtn = makeButton("NEXT  \u25B6", "plain", step);
@@ -395,7 +395,7 @@ window.roomInteractions[14] = {
 
       (function next(k) {
         if (stale()) return;
-        if (k === last) { showEnd(); return; }
+        if (k === last) { showFinal(); return; }
         say(groups[k]);
         later(() => next(k + 1), CONFIG.groupMs + CONFIG.perCharMs * groups[k].length);
       })(0);
