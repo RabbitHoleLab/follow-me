@@ -4,7 +4,19 @@
 /*
  * RABBITHOLELAB — LOST & FOUND
  * ROOM 05 — THE WAITING ROOM
+ * YOUR SOURCE CODE REQUEST
+ * IS IMPORTANT TO US.
+ *
+ * YOU ARE CURRENTLY NUMBER 1
+ * IN A QUEUE OF 0.
+ *
+ * PLEASE HOLD.
+ *
+ * ...
+ *
+ * PLEASE CONTINUE HOLDING.
  */
+
 
 window.roomInteractions ??= {};
 
