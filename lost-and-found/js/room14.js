@@ -363,9 +363,9 @@ window.roomInteractions[14] = {
       const last = groups.length - 1;
       const stale = () => !active || run !== finaleRun;
 
-      function showEnd() {
-        if (stale()) return;
+      function showFinal() {
         say(groups[last]);
+      
         const again = makeButton("BACK TO THE DESK", "plain", start);
         setActions(again);
         again.focus({ preventScroll: true });
@@ -386,7 +386,10 @@ window.roomInteractions[14] = {
         return;
       }
 
-      const skip = makeButton("SKIP  \u25B6", "plain", () => { clearTimers(); showEnd(); });
+      const skip = makeButton("SKIP  \u25B6", "plain", () => {
+        finaleRun++;
+        showFinal();
+      });
       setActions(skip);
       skip.focus({ preventScroll: true });
 
