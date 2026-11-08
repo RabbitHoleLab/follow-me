@@ -3,11 +3,29 @@
 
 /*
  * RABBITHOLELAB — LOST & FOUND
+ *
+ * HELLO, DEVELOPER.
+ *
+ * YES, WE KNOW.
+ * YOU WANTED TO SEE HOW IT WORKS.
+ *
+ * UNFORTUNATELY,
+ * SO DID EVERYONE ELSE.
+ *
+ * THE MAP IS NOT THE TERRITORY.
+ * THE CODE IS NOT THE ANSWER.
+ *
+ * BUT THANK YOU FOR CHECKING.
+ *
+ * — THE WHITE RABBIT
+ *
+ *
  * Interactive map controller
  *
  * Coordinates are calibrated.
  * Do not modify them unless the map image changes.
  */
+ 
 
 // ==================================================
 // 1. ROOM COORDINATES
