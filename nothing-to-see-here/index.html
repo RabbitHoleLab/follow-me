@@ -1,0 +1,241 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Nothing to See Here</title>
+<style>
+:root {
+  color-scheme: dark;
+}
+* {
+  box-sizing: border-box;
+}
+html, body {
+  margin: 0;
+  min-height: 100%;
+}
+body {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background: #050708;
+  color: #e5eee8;
+  font-family: Consolas, "Courier New", monospace;
+}
+.stage {
+  position: relative;
+  width: min(92vw, 900px);
+  height: min(65vh, 460px);
+  min-height: 300px;
+  display: grid;
+  place-items: center;
+  isolation: isolate;
+}
+.fragment {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1;
+  text-align: center;
+  color: #91e4b0;
+  font-size: clamp(20px, 4vw, 34px);
+  font-weight: bold;
+  letter-spacing: .18em;
+  text-shadow: 0 0 18px #43c97788;
+  white-space: nowrap;
+}
+.word {
+  position: absolute;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  padding: 12px 20px;
+  background: #101718;
+  border: 1px solid #354b43;
+  box-shadow: 0 8px 30px #000b;
+  color: #e5eee8;
+  font-size: clamp(19px, 4.6vw, 48px);
+  font-weight: bold;
+  letter-spacing: .1em;
+  white-space: nowrap;
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+  transition: border-color .2s, box-shadow .2s;
+}
+.word:hover {
+  border-color: #638c75;
+  box-shadow: 0 0 22px #4c986033;
+}
+.word.dragging {
+  cursor: grabbing;
+  border-color: #9fe1b2;
+  box-shadow: 0 0 30px #4c986055;
+}
+.word:focus-visible {
+  outline: 2px solid #a4e6bb;
+  outline-offset: 4px;
+}
+#nothing {
+  left: 50%;
+  top: 30%;
+  transform: translate(-50%, -50%);
+}
+#to-see {
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+#here {
+  left: 50%;
+  top: 70%;
+  transform: translate(-50%, -50%);
+}
+@media (max-width: 500px) {
+  .word {
+    padding: 12px 16px;
+    letter-spacing: .06em;
+  }
+}
+</style>
+</head>
+<body>
+<main class="stage" id="stage">
+  <div class="fragment">★ ILLES</div>
+
+  <div class="word" id="nothing" tabindex="0"
+       aria-label="NOTHING, movable">
+    NOTHING
+  </div>
+
+  <div class="word" id="to-see" tabindex="0"
+       aria-label="TO SEE, movable">
+    TO SEE
+  </div>
+
+  <div class="word" id="here" tabindex="0"
+       aria-label="HERE, movable">
+    HERE
+  </div>
+</main>
+
+<script>
+(() => {
+  "use strict";
+
+  const stage = document.getElementById("stage");
+  const words = [...document.querySelectorAll(".word")];
+
+  let active = null;
+  let topLayer = 2;
+
+  function moveTo(word, x, y) {
+    const area = stage.getBoundingClientRect();
+    const rect = word.getBoundingClientRect();
+
+    const halfW = rect.width / 2;
+    const halfH = rect.height / 2;
+
+    const minX = halfW;
+    const maxX = Math.max(halfW, area.width - halfW);
+    const minY = halfH;
+    const maxY = Math.max(halfH, area.height - halfH);
+
+    const localX = Math.max(minX, Math.min(maxX, x));
+    const localY = Math.max(minY, Math.min(maxY, y));
+
+    word.style.left = localX + "px";
+    word.style.top = localY + "px";
+    word.style.transform = "translate(-50%, -50%)";
+  }
+
+  words.forEach(word => {
+    word.addEventListener("pointerdown", event => {
+      if (event.button !== 0 && event.pointerType === "mouse") {
+        return;
+      }
+
+      const rect = word.getBoundingClientRect();
+      const area = stage.getBoundingClientRect();
+
+      active = {
+        word,
+        pointerId: event.pointerId,
+        offsetX: event.clientX - (rect.left + rect.width / 2),
+        offsetY: event.clientY - (rect.top + rect.height / 2)
+      };
+
+      word.setPointerCapture(event.pointerId);
+      word.classList.add("dragging");
+      word.style.zIndex = ++topLayer;
+
+      event.preventDefault();
+    });
+
+    word.addEventListener("pointermove", event => {
+      if (!active ||
+          active.word !== word ||
+          active.pointerId !== event.pointerId) {
+        return;
+      }
+
+      const area = stage.getBoundingClientRect();
+
+      moveTo(
+        word,
+        event.clientX - area.left - active.offsetX,
+        event.clientY - area.top - active.offsetY
+      );
+    });
+
+    function stopDrag(event) {
+      if (!active ||
+          active.word !== word ||
+          active.pointerId !== event.pointerId) {
+        return;
+      }
+
+      word.classList.remove("dragging");
+      active = null;
+    }
+
+    word.addEventListener("pointerup", stopDrag);
+    word.addEventListener("pointercancel", stopDrag);
+
+    word.addEventListener("keydown", event => {
+      const step = event.shiftKey ? 40 : 15;
+
+      const delta = {
+        ArrowLeft: [-step, 0],
+        ArrowRight: [step, 0],
+        ArrowUp: [0, -step],
+        ArrowDown: [0, step]
+      }[event.key];
+
+      if (!delta) return;
+
+      event.preventDefault();
+
+      const area = stage.getBoundingClientRect();
+      const rect = word.getBoundingClientRect();
+
+      moveTo(
+        word,
+        rect.left + rect.width / 2 - area.left + delta[0],
+        rect.top + rect.height / 2 - area.top + delta[1]
+      );
+
+      word.style.zIndex = ++topLayer;
+    });
+  });
+})();
+</script>
+</body>
+</html>
