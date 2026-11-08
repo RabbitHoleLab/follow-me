@@ -37,6 +37,10 @@ window.roomInteractions[8] = {
     //   Mettre Infinity pour exiger de quitter la zone avec le pointeur (comportement d'origine).
     const IDLE_AFTER = 1.2;
 
+    const reducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)"
+    ).matches;
+
     let active = true;
     let animationId = null;
     let lastTime = 0;
