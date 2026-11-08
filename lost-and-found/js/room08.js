@@ -1,23 +1,51 @@
-
 "use strict";
 
 /*
- * RABBITHOLELAB — LOST & FOUND
- * ROOM 08 — PERCEPTION
+ * RABBITHOLELAB — ROOM 08
+ * PERCEPTION DEPARTMENT
  *
- * The answer is never displayed as a complete word.
+ * OH.
+ * YOU FOUND THE SOURCE CODE.
+ *
+ * PLEASE STOP LOOKING AT IT.
+ *
+ * ...
+ *
+ * YOU'RE STILL LOOKING.
+ *
+ * INTERESTING.
+ *
+ * THE CODE BEHAVES DIFFERENTLY
+ * WHEN IT KNOWS IT IS BEING WATCHED.
+ *
+ * OR DOES IT?
+ *
+ * — OBSERVATION DEPARTMENT
+ *
+ *
+ * NOTE TO DEVELOPER:
+ *
+ * THE BUG YOU ARE LOOKING FOR
+ * IS CURRENTLY LOOKING FOR YOU.
  */
 
-window.roomInteractions ??= {};
+window.roomInteractions = window.roomInteractions || {};   // ★ compatible anciens navigateurs (au lieu de ??=)
 
 window.roomInteractions[8] = {
   mount(container) {
+    // ★ Réglage : secondes d'immobilité du pointeur avant qu'on considère que le joueur "arrête de regarder".
+    //   Mettre Infinity pour exiger de quitter la zone avec le pointeur (comportement d'origine).
+    const IDLE_AFTER = 1.2;
+
     let active = true;
     let animationId = null;
     let lastTime = 0;
     let elapsed = 0;
     let pointer = null;
+    let lastMove = -Infinity;   // ★ instant (s) du dernier mouvement du pointeur
     let calm = 0;
+    let settle = 0;             // ★ 0 = signal agité, 1 = au repos (lissé : plus de "saut")
+    let lastMessage = "";       // ★ le message n'est réécrit que s'il change
 
     const room = document.createElement("section");
 
@@ -42,7 +70,7 @@ window.roomInteractions[8] = {
 
         .r8-field {
           position: relative;
-          height: 300px;
+          height: 260px;
           overflow: hidden;
           border: 1px solid #1b3a2a;
           border-radius: 5px;
@@ -126,7 +154,7 @@ window.roomInteractions[8] = {
 
         @media (max-width: 480px) {
           .r8-field {
-            height: 260px;
+            height: 230px;
           }
 
           .r8-heading {
@@ -146,9 +174,9 @@ window.roomInteractions[8] = {
           VISUAL SIGNAL // (8)
         </div>
 
-        <div class="r8-field"
+        <div class="r8-field" role="group"
              aria-label="An unstable visual signal containing drifting letters">
-          <div class="r8-observer"></div>
+          <div class="r8-observer" aria-hidden="true"></div>
         </div>
 
         <div class="r8-message" aria-live="polite">
@@ -192,9 +220,18 @@ window.roomInteractions[8] = {
         x: (0.12 + (index * 0.173) % 0.76),
         y: (0.16 + (index * 0.237) % 0.67),
         phase: index * 1.91,
-        speed: 0.32 + (index % 5) * 0.09
+        speed: 0.32 + (index % 5) * 0.09,
+        fx: 0,                    // ★ décalage de fuite, lissé
+        fy: 0
       };
     });
+
+    // ★ n'écrit dans le DOM (zone aria-live) que lorsque le texte change réellement
+    function setMessage(text) {
+      if (text === lastMessage) return;
+      lastMessage = text;
+      message.textContent = text;
+    }
 
     function setPointer(event) {
       const rect = field.getBoundingClientRect();
@@ -205,6 +242,7 @@ window.roomInteractions[8] = {
       };
 
       calm = 0;
+      lastMove = elapsed;         // ★
 
       observer.style.left = pointer.x + "px";
       observer.style.top = pointer.y + "px";
@@ -227,9 +265,74 @@ window.roomInteractions[8] = {
     });
     field.addEventListener("pointercancel", clearPointer);
 
-    const reducedMotion = window.matchMedia(
-      "(prefers-reduced-motion: reduce)"
-    ).matches;
+    const clampX = (x, width) => Math.max(8, Math.min(width - 30, x));
+    const clampY = (y, height) => Math.max(8, Math.min(height - 30, y));
+
+    function frame(delta, width, height) {
+      // ★ le joueur "regarde" tant que le pointeur est là ET bouge ; immobile, il "arrête de regarder"
+      const observing = pointer !== null && (elapsed - lastMove) < IDLE_AFTER;
+
+      if (!observing) {
+        calm = Math.min(calm + delta, 5);
+      }
+
+      // ★ repos lissé : plus de saut brutal quand le pointeur revient
+      const target = observing ? 0 : Math.min(calm / 3, 1);
+      settle += (target - settle) * Math.min(1, delta * (target > settle ? 2.5 : 8));
+
+      letters.forEach(letter => {
+        const t = elapsed * letter.speed;
+        const homeX = width * letter.x;
+        const homeY = height * letter.y;
+
+        let x = homeX + Math.sin(t + letter.phase) * 24 * (1 - settle);
+        let y = homeY + Math.cos(t * 0.77 + letter.phase) * 20 * (1 - settle);
+
+        let opacity = 0.5 + 0.35 * Math.sin(t * 0.8 + letter.phase);
+
+        let wantX = 0;
+        let wantY = 0;
+
+        if (observing) {
+          const dx = x - pointer.x;
+          const dy = y - pointer.y;
+          const distance = Math.hypot(dx, dy);
+
+          if (distance < 100 && distance > 0.01) {
+            const force = (100 - distance) / 100;
+
+            wantX = (dx / distance) * force * 36;
+            wantY = (dy / distance) * force * 36;
+
+            opacity = Math.max(opacity, 0.95);
+          }
+        } else {
+          // When left alone, the signal becomes easier to read.
+          opacity = Math.max(opacity, 0.55 + settle * 0.3);
+        }
+
+        // ★ la fuite s'installe et se relâche en douceur
+        const k = Math.min(1, delta * 10);
+        letter.fx += (wantX - letter.fx) * k;
+        letter.fy += (wantY - letter.fy) * k;
+
+        x = clampX(x + letter.fx, width);
+        y = clampY(y + letter.fy, height);
+
+        letter.element.style.transform =
+          "translate(" + x + "px," + y + "px)";
+
+        letter.element.style.opacity = opacity;
+      });
+
+      if (observing) {
+        setMessage("THE CLOSER YOU LOOK, THE MORE IT MOVES.");
+      } else if (calm > 2.5) {
+        setMessage("SOMETIMES YOU NEED TO STOP LOOKING.");
+      } else {
+        setMessage("THE PATTERN IS NOT MISSING.");
+      }
+    }
 
     function animate(timestamp) {
       if (!active) return;
@@ -244,88 +347,45 @@ window.roomInteractions[8] = {
       lastTime = timestamp;
       elapsed += delta;
 
-      if (!pointer) {
-        calm = Math.min(calm + delta, 5);
-      }
-
       const width = field.clientWidth;
       const height = field.clientHeight;
 
-      letters.forEach(letter => {
-        const t = elapsed * letter.speed;
+      // ★ fenêtre pas encore affichée (taille 0) : on attend au lieu de tout empiler dans un coin
+      if (width && height) frame(delta, width, height);
 
-        let x =
-          width * letter.x +
-          Math.sin(t + letter.phase) * 24;
-
-        let y =
-          height * letter.y +
-          Math.cos(t * 0.77 + letter.phase) * 20;
-
-        let opacity = 0.5 +
-          0.35 * Math.sin(t * 0.8 + letter.phase);
-
-        if (pointer) {
-          const dx = x - pointer.x;
-          const dy = y - pointer.y;
-          const distance = Math.hypot(dx, dy);
-
-          if (distance < 100 && distance > 0.01) {
-            const force = (100 - distance) / 100;
-
-            x += (dx / distance) * force * 36;
-            y += (dy / distance) * force * 36;
-
-            opacity = Math.max(opacity, 0.95);
-          }
-        } else {
-          // When left alone, the signal becomes easier to read.
-          const stillness = Math.min(calm / 3, 1);
-
-          x = x * (1 - stillness) +
-              width * letter.x * stillness;
-
-          y = y * (1 - stillness) +
-              height * letter.y * stillness;
-
-          opacity = Math.max(
-            opacity,
-            0.55 + stillness * 0.3
-          );
-        }
-
-        if (reducedMotion) {
-          x = width * letter.x;
-          y = height * letter.y;
-          opacity = 0.85;
-        }
-
-        x = Math.max(8, Math.min(width - 30, x));
-        y = Math.max(8, Math.min(height - 30, y));
-
-        letter.element.style.transform =
-          "translate(" + x + "px," + y + "px)";
-
-        letter.element.style.opacity = opacity;
-      });
-
-      if (pointer) {
-        message.textContent =
-          "THE CLOSER YOU LOOK, THE MORE IT MOVES.";
-      } else if (calm > 2.5) {
-        message.textContent =
-          "SOMETIMES YOU NEED TO STOP LOOKING.";
-      } else {
-        message.textContent =
-          "THE PATTERN IS NOT MISSING.";
-      }
-
-      if (!reducedMotion) {
-        animationId = requestAnimationFrame(animate);
-      }
+      animationId = requestAnimationFrame(animate);
     }
 
-    animationId = requestAnimationFrame(animate);
+    // ★ Mouvement réduit : disposition fixe, recalculée si la taille change (rotation, redimensionnement)
+    function placeStatic() {
+      const width = field.clientWidth;
+      const height = field.clientHeight;
+      if (!width || !height) return;
+
+      letters.forEach(letter => {
+        letter.element.style.transform =
+          "translate(" + clampX(width * letter.x, width) + "px," +
+          clampY(height * letter.y, height) + "px)";
+        letter.element.style.opacity = 0.85;
+      });
+
+      setMessage("THE PATTERN IS NOT MISSING.");
+    }
+
+    let resizeObserver = null;
+    const onResize = () => placeStatic();
+
+    if (reducedMotion) {
+      placeStatic();
+      if (typeof ResizeObserver === "function") {
+        resizeObserver = new ResizeObserver(onResize);
+        resizeObserver.observe(field);
+      } else {
+        window.addEventListener("resize", onResize);
+      }
+    } else {
+      animationId = requestAnimationFrame(animate);
+    }
 
     return () => {
       active = false;
@@ -333,6 +393,9 @@ window.roomInteractions[8] = {
       if (animationId !== null) {
         cancelAnimationFrame(animationId);
       }
+
+      if (resizeObserver) resizeObserver.disconnect();
+      window.removeEventListener("resize", onResize);
 
       room.remove();
     };
