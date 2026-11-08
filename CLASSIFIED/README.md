@@ -32,6 +32,20 @@ STATUS: UNVERIFIED
 
 ---
 
+## SYSTEM DIAGNOSTIC
+
+The public interface is operating normally.
+
+An unexpected anomaly was detected during routine verification.
+
+What do you call a brief malfunction that interrupts a system's expected behavior? (2)
+
+The incident has been classified as normal.
+
+No further investigation is required.
+
+---
+
 WARNING:
 
 Do not trust the public interface.
